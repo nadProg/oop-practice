@@ -22,3 +22,14 @@ export function injectCss(css: string, id: string) {
   styleSheet.replaceSync(css);
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, styleSheet];
 }
+
+
+export const formatError = (error: unknown) => {
+  let message = String(error);
+
+  if (message.startsWith('Error:')) {
+    message = message.slice(6);
+  }
+
+  return message.trim();
+}

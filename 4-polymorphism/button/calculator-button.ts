@@ -1,4 +1,4 @@
-import { injectCss } from "../utils";
+import { formatError, injectCss } from "../utils";
 
 export abstract class CalculatorButton {
   private root: HTMLButtonElement;
@@ -6,9 +6,8 @@ export abstract class CalculatorButton {
   constructor(text: string) {
     this.root = this.createRoot(text);
 
-    this.root.addEventListener("click", () => {
-      this.onClick();
-    });
+    this.clickListener = this.clickListener.bind(this);
+    this.root.addEventListener("click", this.clickListener);
   }
 
   public addClass(className: string) {
@@ -17,6 +16,14 @@ export abstract class CalculatorButton {
   }
 
   abstract onClick(): void;
+
+  private clickListener() {
+    try {
+      this.onClick()
+    } catch (error) {
+      alert(formatError(error));
+    }
+  }
 
   public renderTo(container: Element) {
     this.initCss();

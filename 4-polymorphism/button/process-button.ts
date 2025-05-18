@@ -5,15 +5,15 @@ import { CalculatorButton } from "./calculator-button";
 export class ProcessButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
     super("=");
-    super.addClass("process_calculator_button");
+    this.addClass("process_calculator_button");
   }
 
   onClick() {
-    if (this.model.canProcess()) {
-      this.model.processCalculation();
-    } else {
-      alert("Can not process");
+    if (!this.model.canProcess()) {
+      throw new Error('Can not process')
     }
+
+    this.model.processCalculation();
   }
 
   protected initCss(): void {
