@@ -1,4 +1,9 @@
-import { type BiOperator, type UnOperator } from "../operator";
+import {
+  type BiOperator,
+  type BiOperatorKey,
+  type UnOperator,
+  type UnOperatorKey,
+} from "../operator";
 import { AddOperator } from "./AddOperator";
 import { SubtractOperator } from "./SubtractOperator";
 import { DivideOperator } from "./DivideOperator";
@@ -9,17 +14,22 @@ import { CosOperator } from "./CosOperator.ts";
 import { FactorialOperator } from "./FactorialOperator.ts";
 import { LogOperator } from "./LogOperator.ts";
 
-type SerializableOperator<K extends string> = {
-  kind: K;
-  key: string;
+type SerializableOperator<
+  Kind extends string,
+  Key extends BiOperatorKey | UnOperatorKey,
+> = {
+  kind: Kind;
+  key: Key;
 };
 
-type SerializableBiOperator = SerializableOperator<"bi">;
+type SerializableBiOperator = SerializableOperator<"bi", BiOperatorKey>;
 
-type SerializableUnOperator = SerializableOperator<"un">;
+type SerializableUnOperator = SerializableOperator<"un", UnOperatorKey>;
 
 export class BiOperatorFactory {
-  private static operatorRegistry: { [key: string]: BiOperator } = {
+  private static readonly operatorRegistry: {
+    [K in BiOperatorKey]: BiOperator;
+  } = {
     "+": new AddOperator(),
     "-": new SubtractOperator(),
     "/": new DivideOperator(),
@@ -42,7 +52,7 @@ export class BiOperatorFactory {
 }
 
 export class UnOperatorFactory {
-  private static operatorRegistry: { [key: string]: UnOperator } = {
+  private static operatorRegistry: { [Key in UnOperatorKey]: UnOperator } = {
     sin: new SinOperator(),
     cos: new CosOperator(),
     log10: new LogOperator(),

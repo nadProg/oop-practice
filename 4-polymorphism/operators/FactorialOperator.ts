@@ -19,7 +19,10 @@ function factorial(n: number): number {
   return result;
 }
 
-export class FactorialOperator extends AbstractOperator implements UnOperator {
+export class FactorialOperator
+  extends AbstractOperator<"n!">
+  implements UnOperator
+{
   constructor() {
     super("n!");
   }

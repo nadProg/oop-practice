@@ -2,7 +2,7 @@ import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
 import { AbstractOperator, type UnOperator } from "../operator";
 
-export class CosOperator extends AbstractOperator implements UnOperator {
+export class CosOperator extends AbstractOperator<"cos"> implements UnOperator {
   constructor() {
     super("cos");
   }

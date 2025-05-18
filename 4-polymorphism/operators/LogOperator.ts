@@ -2,7 +2,10 @@ import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
 import { AbstractOperator, type UnOperator } from "../operator";
 
-export class LogOperator extends AbstractOperator implements UnOperator {
+export class LogOperator
+  extends AbstractOperator<"log10">
+  implements UnOperator
+{
   constructor() {
     super("log10");
   }

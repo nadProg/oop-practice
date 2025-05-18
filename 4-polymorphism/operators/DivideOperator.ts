@@ -2,7 +2,10 @@ import { AbstractOperator, type BiOperator } from "../operator";
 import type { CalculatorModel } from "../calculator-model";
 import { CalculatorButton } from "../button/calculator-button";
 
-export class DivideOperator extends AbstractOperator implements BiOperator {
+export class DivideOperator
+  extends AbstractOperator<"/">
+  implements BiOperator
+{
   constructor() {
     super("/");
   }

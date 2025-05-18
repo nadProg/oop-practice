@@ -15,12 +15,12 @@ import { isNever } from "./utils";
 
 const SerializableBiOperatorSchema = z.object({
   kind: z.literal("bi"),
-  key: z.string(),
+  key: z.enum(["*", "+", "-", "/", "^"]),
 });
 
 const SerializableUnOperatorSchema = z.object({
   kind: z.literal("un"),
-  key: z.string(),
+  key: z.enum(["sin", "cos", "n!", "log10"]),
 });
 
 const CalculatorSerializableStateSchema = z.object({
@@ -65,6 +65,89 @@ type CalculatorPersistedState = {
   secondOperand: number | null;
   events: (BiOperatorCalculatedEvent | UnOperatorCalculatedEvent)[];
 };
+
+class CalculatorPersistenceSubscriber
+  extends BaseCalculatorSubscriber
+  implements CalculatorSubscriber
+{
+  constructor(private persistence: CalculatorPersistence) {
+    super();
+  }
+
+  public currentOperandUpdated(operand: number, type: "first" | "second") {
+    if (type === "first") {
+      this.persistence.storage.update((prevState) => ({
+        ...prevState,
+        firstOperand: operand,
+      }));
+      return;
+    }
+
+    if (type === "second") {
+      this.persistence.storage.update((prevState) => ({
+        ...prevState,
+        secondOperand: operand,
+      }));
+    }
+  }
+
+  public biOperatorAdded(operator: BiOperator, firstOperand: number): void {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      firstOperand,
+      operator: BiOperatorFactory.toSerializable(operator),
+      secondOperand: null,
+    }));
+  }
+
+  public biOperatorCalculated(event: BiOperatorCalculatedEvent): void {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      firstOperand: event.result,
+      operator: null,
+      secondOperand: null,
+      events: [
+        ...prevState.events,
+        {
+          ...event,
+          operator: BiOperatorFactory.toSerializable(event.operator),
+        },
+      ],
+    }));
+  }
+
+  public unOperatorCalculated(event: UnOperatorCalculatedEvent): void {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      firstOperand: event.result,
+      secondOperand: null,
+      operator: null,
+      events: [
+        ...prevState.events,
+        {
+          ...event,
+          operator: UnOperatorFactory.toSerializable(event.operator),
+        },
+      ],
+    }));
+  }
+
+  public cleared(): void {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      firstOperand: null,
+      operator: null,
+      secondOperand: null,
+    }));
+  }
+
+  public historyCleared() {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      events: [],
+    }));
+  }
+}
 
 class CalculatorPersistenceFacade {
   private persistence = new CalculatorPersistence();
@@ -221,86 +304,3 @@ class CalculatorPersistenceFacade {
 }
 
 export { CalculatorPersistenceFacade as CalculatorPersistence };
-
-class CalculatorPersistenceSubscriber
-  extends BaseCalculatorSubscriber
-  implements CalculatorSubscriber
-{
-  constructor(private persistence: CalculatorPersistence) {
-    super();
-  }
-
-  public currentOperandUpdated(operand: number, type: "first" | "second") {
-    if (type === "first") {
-      this.persistence.storage.update((prevState) => ({
-        ...prevState,
-        firstOperand: operand,
-      }));
-      return;
-    }
-
-    if (type === "second") {
-      this.persistence.storage.update((prevState) => ({
-        ...prevState,
-        secondOperand: operand,
-      }));
-    }
-  }
-
-  public biOperatorAdded(operator: BiOperator, firstOperand: number): void {
-    this.persistence.storage.update((prevState) => ({
-      ...prevState,
-      firstOperand,
-      operator: BiOperatorFactory.toSerializable(operator),
-      secondOperand: null,
-    }));
-  }
-
-  public biOperatorCalculated(event: BiOperatorCalculatedEvent): void {
-    this.persistence.storage.update((prevState) => ({
-      ...prevState,
-      firstOperand: event.result,
-      operator: null,
-      secondOperand: null,
-      events: [
-        ...prevState.events,
-        {
-          ...event,
-          operator: BiOperatorFactory.toSerializable(event.operator),
-        },
-      ],
-    }));
-  }
-
-  public unOperatorCalculated(event: UnOperatorCalculatedEvent): void {
-    this.persistence.storage.update((prevState) => ({
-      ...prevState,
-      firstOperand: event.result,
-      secondOperand: null,
-      operator: null,
-      events: [
-        ...prevState.events,
-        {
-          ...event,
-          operator: UnOperatorFactory.toSerializable(event.operator),
-        },
-      ],
-    }));
-  }
-
-  public cleared(): void {
-    this.persistence.storage.update((prevState) => ({
-      ...prevState,
-      firstOperand: null,
-      operator: null,
-      secondOperand: null,
-    }));
-  }
-
-  public historyCleared() {
-    this.persistence.storage.update((prevState) => ({
-      ...prevState,
-      events: [],
-    }));
-  }
-}
