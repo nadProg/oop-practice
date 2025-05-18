@@ -65,6 +65,8 @@ export class CalculatorHistory {
         padding: 5px;
         margin: 2px 0;
         border-radius: 3px;
+        font-family: monospace;
+        font-size: 16px;
       }
       .calculator_history-item.add {
         color: #2ecc71;

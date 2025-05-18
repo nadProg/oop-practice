@@ -14,6 +14,9 @@ import { MultiplyButton } from "./operators/MultiplyOperator";
 import { PowButton } from "./operators/PowOperator";
 import { SubtractButton } from "./operators/SubtractOperator";
 import { injectCss } from "./utils";
+import { SinButton } from "./operators/SinOperator";
+import { LogButton } from "./operators/LogOperator";
+import { FactorialButton } from "./operators/FactorialOperator";
 
 class Calculator {
   private root: HTMLDivElement;
@@ -57,7 +60,11 @@ class Calculator {
       new AddButton(this.model),
       // 5 row
       new PowButton(this.model),
-      new CosButton(this.model)
+      new CosButton(this.model),
+      new SinButton(this.model),
+      new LogButton(this.model),
+      // 6 row
+      new FactorialButton(this.model)
     ];
 
     this.root = this.createRoot();

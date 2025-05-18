@@ -37,6 +37,7 @@ export class CalculatorExpression {
       /* css*/ `
     .calculator_expression {
       font-size: 18px;
+      font-family: monospace;
       color: #666;
       margin-bottom: 5px;
       min-height: 24px;
