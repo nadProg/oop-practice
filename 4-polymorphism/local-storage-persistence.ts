@@ -46,7 +46,14 @@ export class LocalStoragePersistence<Z extends z.ZodTypeAny> {
 
   public update(setter: (prevState: z.output<Z>) => z.output<Z>): boolean {
     try {
-      const prevState = this.load();
+      let prevState: z.output<Z>;
+
+      try {
+        prevState = this.load();
+      } catch {
+        prevState = this.defaultState;
+      }
+
       this.save(setter(prevState));
       return true;
     } catch (error) {

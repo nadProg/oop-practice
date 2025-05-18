@@ -1,8 +1,12 @@
-import type { BiOperator } from "../operator";
+import { AbstractOperator, type BiOperator } from "../operator";
 import type { CalculatorModel } from "../calculator-model";
 import { CalculatorButton } from "../button/calculator-button";
 
-class DivideOperator implements BiOperator {
+export class DivideOperator extends AbstractOperator implements BiOperator {
+  constructor() {
+    super("/");
+  }
+
   calculate(firstOperand: number, secondOperand: number): number {
     if (secondOperand === 0) {
       throw new Error("Деление на ноль");

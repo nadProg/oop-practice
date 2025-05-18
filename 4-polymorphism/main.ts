@@ -7,7 +7,7 @@ import { CalculatorDisplay } from "./calculator-display";
 import { CalculatorExpression } from "./calculator-expression";
 import { CalculatorHistory } from "./calculator-history";
 import { CalculatorModel } from "./calculator-model";
-import { CalculatorPersistence } from "./calculator-persistence";
+import { CalculatorPersistenceFacade } from "./calculator-persistence";
 
 import { AddButton } from "./operators/AddOperator";
 import { CosButton } from "./operators/CosOperator";
@@ -27,13 +27,13 @@ class Calculator {
   private model: CalculatorModel;
   private history: CalculatorHistory;
   private buttons: CalculatorButton[];
-  private persistence: CalculatorPersistence;
+  private persistence: CalculatorPersistenceFacade;
 
   constructor() {
     this.display = new CalculatorDisplay();
     this.expression = new CalculatorExpression();
     this.history = new CalculatorHistory();
-    this.persistence = new CalculatorPersistence();
+    this.persistence = new CalculatorPersistenceFacade();
     this.model = new CalculatorModel(this.persistence);
 
     this.model.addSubscriber(this.display.subscriber);
@@ -78,14 +78,18 @@ class Calculator {
   }
 
   private initViews() {
-    const state = this.persistence.storage.safeLoad();
+    const state = this.persistence.load();
+
     if (!state) {
       return;
     }
 
-    const displayNumber = state.firstOperand;
-    if (displayNumber !== null) {
-      this.display.setNumber(displayNumber);
+    if (state.firstOperand !== null) {
+      this.display.setNumber(state.firstOperand);
+    }
+
+    if (state.operator && state.firstOperand !== null) {
+      this.expression.setOperator(state.firstOperand, state.operator);
     }
   }
 

@@ -6,26 +6,59 @@ import {
   type UnOperatorCalculatedEvent,
 } from "./calculator-subscriber";
 import { LocalStoragePersistence } from "./local-storage-persistence";
+import type { BiOperator } from "./operator";
+import { BiOperatorFactory } from "./operators/operator-factory";
 
-const CalculatorStateSchema = z.object({
+const CalculatorSerializableStateSchema = z.object({
   firstOperand: z.number().nullable(),
+  operator: z
+    .object({
+      kind: z.literal("bi"),
+      key: z.string(),
+    })
+    .nullable(),
   secondOperand: z.number().nullable(),
 });
 
-export class CalculatorPersistence
+class CalculatorPersistence
   extends BaseCalculatorSubscriber
   implements CalculatorSubscriber
 {
   public subscriber = new CalculatorPersistenceSubscriber(this);
   public storage = new LocalStoragePersistence(
     "calculator_state",
-    CalculatorStateSchema,
-    { firstOperand: null, secondOperand: null },
+    CalculatorSerializableStateSchema,
+    { firstOperand: null, operator: null, secondOperand: null },
     "1",
   );
+}
 
-  constructor() {
-    super();
+type CalculatorPersistedState = {
+  firstOperand: number | null;
+  operator: BiOperator | null;
+  secondOperand: number | null;
+};
+
+export class CalculatorPersistenceFacade {
+  private persistence = new CalculatorPersistence();
+
+  get subscriber() {
+    return this.persistence.subscriber;
+  }
+
+  public load(): CalculatorPersistedState | null {
+    const serializableState = this.persistence.storage.safeLoad();
+
+    if (!serializableState) {
+      return null;
+    }
+
+    return {
+      ...serializableState,
+      operator: serializableState.operator
+        ? BiOperatorFactory.fromSerializable(serializableState.operator)
+        : null,
+    };
   }
 }
 
@@ -54,8 +87,13 @@ class CalculatorPersistenceSubscriber
     }
   }
 
-  public biOperatorAdded(): void {
-    return;
+  public biOperatorAdded(operator: BiOperator, firstOperand: number): void {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      firstOperand,
+      operator: BiOperatorFactory.toSerializable(operator),
+      secondOperand: null,
+    }));
   }
 
   public biOperatorCalculated(event: BiOperatorCalculatedEvent): void {
@@ -77,6 +115,7 @@ class CalculatorPersistenceSubscriber
   public cleared(): void {
     this.persistence.storage.update(() => ({
       firstOperand: null,
+      operator: null,
       secondOperand: null,
     }));
   }

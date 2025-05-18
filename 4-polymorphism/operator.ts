@@ -1,4 +1,13 @@
+export class AbstractOperator {
+  constructor(private key: string) {}
+
+  public getKey(): string {
+    return this.key;
+  }
+}
+
 export interface BiOperator {
+  getKey(): string;
   calculate(firstOperand: number, secondOperand: number): number;
   getExpression(firstOperand: number): string;
   getHistoryText(firstOperand: number, secondOperand: number): string;
