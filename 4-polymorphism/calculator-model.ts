@@ -113,4 +113,8 @@ export class CalculatorModel {
     this.operator = null;
     this.subscribers.forEach((s) => s.cleared());
   }
+
+  public clearHistory() {
+    this.subscribers.forEach((s) => s.historyCleared());
+  }
 }

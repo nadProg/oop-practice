@@ -30,11 +30,11 @@ class Calculator {
   private persistence: CalculatorPersistenceFacade;
 
   constructor() {
-    this.display = new CalculatorDisplay();
-    this.expression = new CalculatorExpression();
-    this.history = new CalculatorHistory();
     this.persistence = new CalculatorPersistenceFacade();
     this.model = new CalculatorModel(this.persistence);
+    this.display = new CalculatorDisplay();
+    this.expression = new CalculatorExpression();
+    this.history = new CalculatorHistory(this.model);
 
     this.model.addSubscriber(this.display.subscriber);
     this.model.addSubscriber(this.expression.subscriber);
@@ -84,8 +84,12 @@ class Calculator {
       return;
     }
 
-    if (state.firstOperand !== null) {
-      this.display.setNumber(state.firstOperand);
+    if (state.operator && state.secondOperand !== null) {
+      this.display.setNumber(state.secondOperand);
+    } else {
+      if (state.firstOperand !== null) {
+        this.display.setNumber(state.firstOperand);
+      }
     }
 
     if (state.operator && state.firstOperand !== null) {

@@ -1,8 +1,12 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
-import type { BiOperator } from "../operator";
+import { AbstractOperator, type BiOperator } from "../operator";
 
-class PowOperator implements BiOperator {
+export class PowOperator extends AbstractOperator implements BiOperator {
+  constructor() {
+    super("^");
+  }
+
   calculate(firstOperand: number, secondOperand: number): number {
     return firstOperand ** secondOperand;
   }

@@ -1,4 +1,7 @@
-import type { CalculatorSubscriber } from "./calculator-subscriber";
+import {
+  BaseCalculatorSubscriber,
+  type CalculatorSubscriber,
+} from "./calculator-subscriber";
 import { injectCss } from "./utils";
 
 export class CalculatorDisplay {
@@ -46,8 +49,13 @@ export class CalculatorDisplay {
   }
 }
 
-class DisplaySubscriber implements CalculatorSubscriber {
-  constructor(private display: CalculatorDisplay) {}
+class DisplaySubscriber
+  extends BaseCalculatorSubscriber
+  implements CalculatorSubscriber
+{
+  constructor(private display: CalculatorDisplay) {
+    super();
+  }
 
   currentOperandUpdated(operand: number): void {
     this.display.setNumber(operand);

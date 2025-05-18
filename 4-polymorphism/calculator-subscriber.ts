@@ -6,6 +6,7 @@ export interface CalculatorSubscriber {
   unOperatorCalculated(event: UnOperatorCalculatedEvent): void;
   biOperatorCalculated(event: BiOperatorCalculatedEvent): void;
   cleared(): void;
+  historyCleared(): void;
 }
 
 export type UnOperatorCalculatedEvent = {
@@ -24,9 +25,10 @@ export type BiOperatorCalculatedEvent = {
 };
 
 export class BaseCalculatorSubscriber implements CalculatorSubscriber {
-  currentOperandUpdated(operand: number, type: "first" | "second"): void {}
-  biOperatorAdded(operator: BiOperator, firstOperand: number): void {}
-  biOperatorCalculated(event: BiOperatorCalculatedEvent): void {}
-  unOperatorCalculated(event: UnOperatorCalculatedEvent): void {}
+  currentOperandUpdated(_: number, __: "first" | "second"): void {}
+  biOperatorAdded(_: BiOperator, __: number): void {}
+  biOperatorCalculated(_: BiOperatorCalculatedEvent): void {}
+  unOperatorCalculated(_: UnOperatorCalculatedEvent): void {}
   cleared(): void {}
+  historyCleared(): void {}
 }

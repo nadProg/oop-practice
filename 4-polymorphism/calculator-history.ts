@@ -7,12 +7,20 @@ import { type CalculatorSubscriber } from "./calculator-subscriber";
 import type { BiOperator, UnOperator } from "./operator";
 import { createElementFromHTML, injectCss } from "./utils";
 
+interface WithClearHistory {
+  clearHistory(): void;
+}
+
 export class CalculatorHistory {
   private root: HTMLDivElement;
+  private clearButton: HTMLButtonElement;
   public subscriber = new HistorySubscriber(this);
 
-  constructor() {
+  constructor(model: WithClearHistory) {
+    this.clearButton = this.createClearButton();
     this.root = this.createRoot();
+    this.root.append(this.clearButton);
+    this.clearButton.addEventListener("click", () => model.clearHistory());
   }
 
   public renderTo(container: Element) {
@@ -44,22 +52,44 @@ export class CalculatorHistory {
     this.root.append(historyItem);
   }
 
+  public clear() {
+    this.root
+      .querySelectorAll(".calculator_history-item")
+      .forEach((element) => {
+        element.remove();
+      });
+  }
+
   private createRoot() {
     const root = document.createElement("div");
     root.classList.add("calculator_history");
     root.innerText = "";
+
     return root;
+  }
+
+  private createClearButton() {
+    const button = document.createElement("button");
+    button.classList.add("calculator_history__clear");
+    button.textContent = "Clear";
+    return button;
   }
 
   private initCss() {
     injectCss(
       /* css*/ `
       .calculator_history {
+        position: relative;
         margin-top: 20px;
         padding: 10px;
         background: #f9f9f9;
         border-radius: 3px;
         min-height: 100px;
+      }
+      .calculator_history__clear {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
       }
       .calculator_history-item {
         padding: 5px;
@@ -108,5 +138,9 @@ class HistorySubscriber
 
   unOperatorCalculated(event: UnOperatorCalculatedEvent): void {
     this.history.addUnOperation(event.operand, event.operator);
+  }
+
+  historyCleared() {
+    this.history.clear();
   }
 }

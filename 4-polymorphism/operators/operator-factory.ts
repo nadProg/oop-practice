@@ -2,6 +2,7 @@ import { AddOperator } from "./AddOperator";
 import { SubtractOperator } from "./SubtractOperator";
 import { DivideOperator } from "./DivideOperator";
 import { MultiplyOperator } from "./MultiplyOperator";
+import { PowOperator } from "./PowOperator.ts";
 import { type BiOperator } from "../operator";
 
 type SerializableOperator<K extends string> = {
@@ -17,6 +18,7 @@ export class BiOperatorFactory {
     "-": new SubtractOperator(),
     "/": new DivideOperator(),
     "*": new MultiplyOperator(),
+    "^": new PowOperator(),
   };
 
   static toSerializable(operator: BiOperator): SerializableBiOperator {

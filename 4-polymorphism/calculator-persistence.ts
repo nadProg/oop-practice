@@ -152,6 +152,7 @@ class CalculatorPersistenceSubscriber
     this.persistence.storage.update((prevState) => ({
       ...prevState,
       firstOperand: event.result,
+      operator: null,
       secondOperand: null,
       events: [
         ...prevState.events,
@@ -168,6 +169,8 @@ class CalculatorPersistenceSubscriber
       ...prevState,
       firstOperand: event.result,
       secondOperand: null,
+      operator: null,
+      events: [...prevState.events],
     }));
   }
 
@@ -177,6 +180,13 @@ class CalculatorPersistenceSubscriber
       firstOperand: null,
       operator: null,
       secondOperand: null,
+    }));
+  }
+
+  public historyCleared() {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      events: [],
     }));
   }
 }
