@@ -9,12 +9,14 @@ export interface CalculatorSubscriber {
 }
 
 export type UnOperatorCalculatedEvent = {
+  type: "UnOperatorCalculatedEvent";
   operator: UnOperator;
   operand: number;
   result: number;
 };
 
 export type BiOperatorCalculatedEvent = {
+  type: "BiOperatorCalculatedEvent";
   operator: BiOperator;
   firstOperand: number;
   secondOperand: number;

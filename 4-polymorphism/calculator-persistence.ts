@@ -6,18 +6,41 @@ import {
   type UnOperatorCalculatedEvent,
 } from "./calculator-subscriber";
 import { LocalStoragePersistence } from "./local-storage-persistence";
-import type { BiOperator } from "./operator";
+import type { BiOperator, UnOperator } from "./operator";
 import { BiOperatorFactory } from "./operators/operator-factory";
+
+const SerializableBiOperatorSchema = z.object({
+  kind: z.literal("bi"),
+  key: z.string(),
+});
+
+// const SerializableUnOperatorSchema = z.object({
+//   kind: z.literal("un"),
+//   key: z.string(),
+// });
+
+// z.object({
+//   type: z.literal("UnOperatorCalculatedEvent"),
+//   operator: SerializableUnOperatorSchema,
+//   operand: z.number(),
+//   result: z.number(),
+// })
 
 const CalculatorSerializableStateSchema = z.object({
   firstOperand: z.number().nullable(),
-  operator: z
-    .object({
-      kind: z.literal("bi"),
-      key: z.string(),
-    })
-    .nullable(),
+  operator: SerializableBiOperatorSchema.nullable(),
   secondOperand: z.number().nullable(),
+  events: z
+    .discriminatedUnion("type", [
+      z.object({
+        type: z.literal("BiOperatorCalculatedEvent"),
+        operator: SerializableBiOperatorSchema,
+        firstOperand: z.number(),
+        secondOperand: z.number(),
+        result: z.number(),
+      }),
+    ])
+    .array(),
 });
 
 class CalculatorPersistence
@@ -28,7 +51,7 @@ class CalculatorPersistence
   public storage = new LocalStoragePersistence(
     "calculator_state",
     CalculatorSerializableStateSchema,
-    { firstOperand: null, operator: null, secondOperand: null },
+    { firstOperand: null, operator: null, secondOperand: null, events: [] },
     "1",
   );
 }
@@ -37,6 +60,7 @@ type CalculatorPersistedState = {
   firstOperand: number | null;
   operator: BiOperator | null;
   secondOperand: number | null;
+  events: BiOperatorCalculatedEvent[];
 };
 
 export class CalculatorPersistenceFacade {
@@ -47,18 +71,46 @@ export class CalculatorPersistenceFacade {
   }
 
   public load(): CalculatorPersistedState | null {
-    const serializableState = this.persistence.storage.safeLoad();
+    try {
+      const serializableState = this.persistence.storage.safeLoad();
 
-    if (!serializableState) {
+      if (!serializableState) {
+        return null;
+      }
+
+      return {
+        ...serializableState,
+        operator: serializableState.operator
+          ? BiOperatorFactory.fromSerializable(serializableState.operator)
+          : null,
+        events: serializableState.events.map((event) => {
+          switch (event.type) {
+            case "BiOperatorCalculatedEvent": {
+              const operator = BiOperatorFactory.fromSerializable(
+                event.operator,
+              );
+
+              if (!operator) {
+                throw new Error(
+                  `Unsupported operator ${JSON.stringify(event.operator)}`,
+                );
+              }
+
+              return {
+                ...event,
+                operator,
+              };
+            }
+
+            default: {
+              throw new Error(`Unsupported event type  ${event.type}`);
+            }
+          }
+        }),
+      };
+    } catch {
       return null;
     }
-
-    return {
-      ...serializableState,
-      operator: serializableState.operator
-        ? BiOperatorFactory.fromSerializable(serializableState.operator)
-        : null,
-    };
   }
 }
 
@@ -101,6 +153,13 @@ class CalculatorPersistenceSubscriber
       ...prevState,
       firstOperand: event.result,
       secondOperand: null,
+      events: [
+        ...prevState.events,
+        {
+          ...event,
+          operator: BiOperatorFactory.toSerializable(event.operator),
+        },
+      ],
     }));
   }
 
@@ -113,7 +172,8 @@ class CalculatorPersistenceSubscriber
   }
 
   public cleared(): void {
-    this.persistence.storage.update(() => ({
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
       firstOperand: null,
       operator: null,
       secondOperand: null,

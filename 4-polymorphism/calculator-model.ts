@@ -64,6 +64,7 @@ export class CalculatorModel {
 
       this.subscribers.forEach((s) =>
         s.unOperatorCalculated({
+          type: "UnOperatorCalculatedEvent",
           operand: this.firstOperand!,
           operator,
           result,
@@ -93,6 +94,7 @@ export class CalculatorModel {
 
       this.subscribers.forEach((s) =>
         s.biOperatorCalculated({
+          type: "BiOperatorCalculatedEvent",
           firstOperand: this.firstOperand!,
           operator: this.operator!,
           result,

@@ -91,6 +91,18 @@ class Calculator {
     if (state.operator && state.firstOperand !== null) {
       this.expression.setOperator(state.firstOperand, state.operator);
     }
+
+    state.events.forEach((event) => {
+      if (event.type === "BiOperatorCalculatedEvent") {
+        this.history.addBiOperation(
+          event.firstOperand,
+          event.operator,
+          event.secondOperand,
+        );
+      }
+
+      // todo: add un operator
+    });
   }
 
   public renderTo(container: Element) {
