@@ -1,7 +1,7 @@
 import type { BiOperator, UnOperator } from "./operator";
 
 export interface CalculatorSubscriber {
-  curentOperandUpdated(operand: number, type: "first" | "second"): void;
+  currentOperandUpdated(operand: number, type: "first" | "second"): void;
   biOperatorAdded(operator: BiOperator, firstOperand: number): void;
   unOperatorCalculated(event: UnOperatorCalculatedEvent): void;
   biOperatorCalculated(event: BiOperatorCalculatedEvent): void;
@@ -22,9 +22,9 @@ export type BiOperatorCalculatedEvent = {
 };
 
 export class BaseCalculatorSubscriber implements CalculatorSubscriber {
-  curentOperandUpdated(operand: number, type: "first" | "second"): void {}
+  currentOperandUpdated(operand: number, type: "first" | "second"): void {}
   biOperatorAdded(operator: BiOperator, firstOperand: number): void {}
-  biOperatorCalculated(ev: BiOperatorCalculatedEvent): void {}
-  unOperatorCalculated(e: UnOperatorCalculatedEvent): void {}
+  biOperatorCalculated(event: BiOperatorCalculatedEvent): void {}
+  unOperatorCalculated(event: UnOperatorCalculatedEvent): void {}
   cleared(): void {}
 }

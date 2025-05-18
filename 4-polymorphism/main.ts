@@ -12,7 +12,7 @@ import { CosButton } from "./operators/CosOperator";
 import { DivideButton } from "./operators/DivideOperator";
 import { MultiplyButton } from "./operators/MultiplyOperator";
 import { PowButton } from "./operators/PowOperator";
-import { SubscractButton } from "./operators/SubscractOperator";
+import { SubtractButton } from "./operators/SubtractOperator";
 import { injectCss } from "./utils";
 
 class Calculator {
@@ -49,7 +49,7 @@ class Calculator {
       new NumberButton("1", this.model),
       new NumberButton("2", this.model),
       new NumberButton("3", this.model),
-      new SubscractButton(this.model),
+      new SubtractButton(this.model),
       // 4 row
       new NumberButton("0", this.model),
       new ClearButton(this.model),

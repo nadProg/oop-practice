@@ -16,20 +16,20 @@ export class CalculatorModel {
       const firstOperand = parseInt(`${this.firstOperand ?? ""}${digitText}`);
       this.firstOperand = firstOperand;
       this.subscribers.forEach((s) =>
-        s.curentOperandUpdated(firstOperand, "first")
+        s.currentOperandUpdated(firstOperand, "first")
       );
     } else {
       const secondOperand = parseInt(`${this.secondOperand ?? ""}${digitText}`);
       this.secondOperand = secondOperand;
       this.subscribers.forEach((s) =>
-        s.curentOperandUpdated(secondOperand, "second")
+        s.currentOperandUpdated(secondOperand, "second")
       );
     }
   }
 
   public addBiOperator(operator: BiOperator) {
     if (this.firstOperand && this.operator && this.secondOperand) {
-      this.processCaclucation();
+      this.processCalculation();
       this.addBiOperator(operator);
     }
 
@@ -68,7 +68,7 @@ export class CalculatorModel {
     );
   }
 
-  public processCaclucation() {
+  public processCalculation() {
     if (
       this.firstOperand !== null &&
       this.operator &&

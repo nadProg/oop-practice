@@ -6,7 +6,7 @@ import { injectCss } from "./utils";
 export class CalculatorExpression {
   private root: HTMLDivElement;
 
-  public readonly subscriber = new ExpresssionSubscriber(this);
+  public readonly subscriber = new ExpressionSubscriber(this);
 
   constructor() {
     this.root = this.createRoot();
@@ -48,23 +48,23 @@ export class CalculatorExpression {
   }
 }
 
-class ExpresssionSubscriber
+class ExpressionSubscriber
   extends BaseCalculatorSubscriber
   implements CalculatorSubscriber
 {
-  constructor(private expresssion: CalculatorExpression) {
+  constructor(private expression: CalculatorExpression) {
     super();
   }
 
   biOperatorAdded(operator: BiOperator, operand: number): void {
-    this.expresssion.setOperator(operand, operator);
+    this.expression.setOperator(operand, operator);
   }
 
   biOperatorCalculated(): void {
-    this.expresssion.clear();
+    this.expression.clear();
   }
 
   cleared(): void {
-    this.expresssion.clear();
+    this.expression.clear();
   }
 }

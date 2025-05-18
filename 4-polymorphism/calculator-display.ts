@@ -49,7 +49,7 @@ export class CalculatorDisplay {
 class DisplaySubscriber implements CalculatorSubscriber {
   constructor(private display: CalculatorDisplay) {}
 
-  curentOperandUpdated(operand: number): void {
+  currentOperandUpdated(operand: number): void {
     this.display.setNumber(operand);
   }
 

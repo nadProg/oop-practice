@@ -12,7 +12,7 @@ class CosOperator implements UnOperator {
   }
 
   getHistoryClass(): string {
-    return `substract`;
+    return ``;
   }
 }
 
