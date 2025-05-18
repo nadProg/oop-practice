@@ -18,17 +18,17 @@ export class CalculatorExpression {
   }
 
   public setOperator(firstOperand: number, operator: BiOperator) {
-    this.root.innerText = operator.getExpression(firstOperand);
+    this.root.innerHTML = operator.getExpression(firstOperand);
   }
 
   public clear() {
-    this.root.innerText = "";
+    this.root.innerHTML = "";
   }
 
   private createRoot() {
     const root = document.createElement("div");
     root.classList.add("calculator_expression");
-    root.innerText = "";
+    root.innerHTML = "";
     return root;
   }
 

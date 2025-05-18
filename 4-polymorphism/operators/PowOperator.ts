@@ -22,7 +22,7 @@ class PowOperator implements BiOperator {
 
 export class PowButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
-    super("^");
+    super("<i>x<sup> y</sup></i>", {serif: true});
   }
 
   onClick() {

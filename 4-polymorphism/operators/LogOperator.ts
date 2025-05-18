@@ -12,7 +12,7 @@ class LogOperator implements UnOperator {
   }
 
   getHistoryText(firstOperand: number): string {
-    return `log(${firstOperand}) = ${this.calculate(firstOperand)}`;
+    return `log<sub>10</sub>(${firstOperand}) = ${this.calculate(firstOperand)}`;
   }
 
   getHistoryClass(): string {
@@ -22,7 +22,7 @@ class LogOperator implements UnOperator {
 
 export class LogButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
-    super("log");
+    super("log<sub>10</sub>");
   }
 
   onClick() {
