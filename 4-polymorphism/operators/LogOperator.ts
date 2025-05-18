@@ -1,8 +1,12 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
-import type { UnOperator } from "../operator";
+import { AbstractOperator, type UnOperator } from "../operator";
 
-class LogOperator implements UnOperator {
+export class LogOperator extends AbstractOperator implements UnOperator {
+  constructor() {
+    super("log10");
+  }
+
   calculate(firstOperand: number): number {
     if (firstOperand <= 0) {
       throw new Error(

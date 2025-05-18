@@ -15,6 +15,7 @@ export interface BiOperator {
 }
 
 export interface UnOperator {
+  getKey(): string;
   calculate(firstOperand: number): number;
   getHistoryText(firstOperand: number): string;
   getHistoryClass(): string;

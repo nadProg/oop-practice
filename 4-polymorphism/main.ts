@@ -84,8 +84,10 @@ class Calculator {
       return;
     }
 
-    if (state.operator && state.secondOperand !== null) {
-      this.display.setNumber(state.secondOperand);
+    if (state.operator) {
+      if (state.secondOperand) {
+        this.display.setNumber(state.secondOperand);
+      }
     } else {
       if (state.firstOperand !== null) {
         this.display.setNumber(state.firstOperand);
@@ -105,7 +107,9 @@ class Calculator {
         );
       }
 
-      // todo: add un operator
+      if (event.type === "UnOperatorCalculatedEvent") {
+        this.history.addUnOperation(event.operand, event.operator);
+      }
     });
   }
 

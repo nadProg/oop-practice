@@ -1,6 +1,6 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
-import type { UnOperator } from "../operator";
+import { AbstractOperator, type UnOperator } from "../operator";
 
 function factorial(n: number): number {
   if (n < 0) {
@@ -19,7 +19,11 @@ function factorial(n: number): number {
   return result;
 }
 
-class FactorialOperator implements UnOperator {
+export class FactorialOperator extends AbstractOperator implements UnOperator {
+  constructor() {
+    super("n!");
+  }
+
   calculate(firstOperand: number): number {
     return factorial(firstOperand);
   }

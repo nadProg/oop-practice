@@ -32,3 +32,5 @@ export const formatError = (error: unknown) => {
 
   return message.trim();
 };
+
+export const isNever = (never: never): never => never;

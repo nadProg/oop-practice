@@ -1,8 +1,12 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
-import type { UnOperator } from "../operator";
+import { AbstractOperator, type UnOperator } from "../operator";
 
-class SinOperator implements UnOperator {
+export class SinOperator extends AbstractOperator implements UnOperator {
+  constructor() {
+    super("sin");
+  }
+
   calculate(firstOperand: number): number {
     return Math.sin(firstOperand);
   }

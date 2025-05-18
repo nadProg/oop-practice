@@ -6,25 +6,22 @@ import {
   type UnOperatorCalculatedEvent,
 } from "./calculator-subscriber";
 import { LocalStoragePersistence } from "./local-storage-persistence";
-import type { BiOperator, UnOperator } from "./operator";
-import { BiOperatorFactory } from "./operators/operator-factory";
+import type { BiOperator } from "./operator";
+import {
+  BiOperatorFactory,
+  UnOperatorFactory,
+} from "./operators/operator-factory";
+import { isNever } from "./utils";
 
 const SerializableBiOperatorSchema = z.object({
   kind: z.literal("bi"),
   key: z.string(),
 });
 
-// const SerializableUnOperatorSchema = z.object({
-//   kind: z.literal("un"),
-//   key: z.string(),
-// });
-
-// z.object({
-//   type: z.literal("UnOperatorCalculatedEvent"),
-//   operator: SerializableUnOperatorSchema,
-//   operand: z.number(),
-//   result: z.number(),
-// })
+const SerializableUnOperatorSchema = z.object({
+  kind: z.literal("un"),
+  key: z.string(),
+});
 
 const CalculatorSerializableStateSchema = z.object({
   firstOperand: z.number().nullable(),
@@ -37,6 +34,12 @@ const CalculatorSerializableStateSchema = z.object({
         operator: SerializableBiOperatorSchema,
         firstOperand: z.number(),
         secondOperand: z.number(),
+        result: z.number(),
+      }),
+      z.object({
+        type: z.literal("UnOperatorCalculatedEvent"),
+        operator: SerializableUnOperatorSchema,
+        operand: z.number(),
         result: z.number(),
       }),
     ])
@@ -60,7 +63,7 @@ type CalculatorPersistedState = {
   firstOperand: number | null;
   operator: BiOperator | null;
   secondOperand: number | null;
-  events: BiOperatorCalculatedEvent[];
+  events: (BiOperatorCalculatedEvent | UnOperatorCalculatedEvent)[];
 };
 
 export class CalculatorPersistenceFacade {
@@ -84,7 +87,9 @@ export class CalculatorPersistenceFacade {
           ? BiOperatorFactory.fromSerializable(serializableState.operator)
           : null,
         events: serializableState.events.map((event) => {
-          switch (event.type) {
+          const { type } = event;
+
+          switch (type) {
             case "BiOperatorCalculatedEvent": {
               const operator = BiOperatorFactory.fromSerializable(
                 event.operator,
@@ -102,8 +107,26 @@ export class CalculatorPersistenceFacade {
               };
             }
 
+            case "UnOperatorCalculatedEvent": {
+              const operator = UnOperatorFactory.fromSerializable(
+                event.operator,
+              );
+
+              if (!operator) {
+                throw new Error(
+                  `Unsupported operator ${JSON.stringify(event.operator)}`,
+                );
+              }
+
+              return {
+                ...event,
+                operator,
+              };
+            }
+
             default: {
-              throw new Error(`Unsupported event type  ${event.type}`);
+              isNever(type);
+              throw new Error(`Unsupported event type  ${type}`);
             }
           }
         }),
@@ -170,7 +193,13 @@ class CalculatorPersistenceSubscriber
       firstOperand: event.result,
       secondOperand: null,
       operator: null,
-      events: [...prevState.events],
+      events: [
+        ...prevState.events,
+        {
+          ...event,
+          operator: UnOperatorFactory.toSerializable(event.operator),
+        },
+      ],
     }));
   }
 

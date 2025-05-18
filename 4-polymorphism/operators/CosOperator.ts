@@ -1,8 +1,12 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
-import type { UnOperator } from "../operator";
+import { AbstractOperator, type UnOperator } from "../operator";
 
-class CosOperator implements UnOperator {
+export class CosOperator extends AbstractOperator implements UnOperator {
+  constructor() {
+    super("cos");
+  }
+
   calculate(firstOperand: number): number {
     return Math.cos(firstOperand);
   }
