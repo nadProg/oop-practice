@@ -2,8 +2,8 @@ import {
   BaseCalculatorSubscriber,
   type BiOperatorCalculatedEvent,
   type UnOperatorCalculatedEvent,
+  type CalculatorSubscriber,
 } from "./calculator-subscriber";
-import { type CalculatorSubscriber } from "./calculator-subscriber";
 import type { BiOperator, UnOperator } from "./operator";
 import { createElementFromHTML, injectCss } from "./utils";
 
@@ -16,11 +16,38 @@ export class CalculatorHistory {
   private clearButton: HTMLButtonElement;
   public subscriber = new HistorySubscriber(this);
 
-  constructor(model: WithClearHistory) {
+  constructor(
+    model: WithClearHistory,
+    initState?: {
+      events: (BiOperatorCalculatedEvent | UnOperatorCalculatedEvent)[];
+    } | null,
+  ) {
     this.clearButton = this.createClearButton();
     this.root = this.createRoot();
     this.root.append(this.clearButton);
     this.clearButton.addEventListener("click", () => model.clearHistory());
+
+    if (initState) {
+      this.initEvents(initState.events);
+    }
+  }
+
+  private initEvents(
+    events: (BiOperatorCalculatedEvent | UnOperatorCalculatedEvent)[],
+  ) {
+    events.forEach((event) => {
+      if (event.type === "BiOperatorCalculatedEvent") {
+        this.addBiOperation(
+          event.firstOperand,
+          event.operator,
+          event.secondOperand,
+        );
+      }
+
+      if (event.type === "UnOperatorCalculatedEvent") {
+        this.addUnOperation(event.operand, event.operator);
+      }
+    });
   }
 
   public renderTo(container: Element) {

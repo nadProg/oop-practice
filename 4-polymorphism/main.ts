@@ -7,7 +7,7 @@ import { CalculatorDisplay } from "./calculator-display";
 import { CalculatorExpression } from "./calculator-expression";
 import { CalculatorHistory } from "./calculator-history";
 import { CalculatorModel } from "./calculator-model";
-import { CalculatorPersistenceFacade } from "./calculator-persistence";
+import { CalculatorPersistence } from "./calculator-persistence";
 
 import { AddButton } from "./operators/AddOperator";
 import { CosButton } from "./operators/CosOperator";
@@ -27,21 +27,23 @@ class Calculator {
   private model: CalculatorModel;
   private history: CalculatorHistory;
   private buttons: CalculatorButton[];
-  private persistence: CalculatorPersistenceFacade;
+  private persistence: CalculatorPersistence;
 
   constructor() {
-    this.persistence = new CalculatorPersistenceFacade();
-    this.model = new CalculatorModel(this.persistence);
-    this.display = new CalculatorDisplay();
-    this.expression = new CalculatorExpression();
-    this.history = new CalculatorHistory(this.model);
+    this.persistence = new CalculatorPersistence();
+    const initialStates = CalculatorPersistence.getInitialCalculatorStates(
+      this.persistence.load(),
+    );
+
+    this.model = new CalculatorModel(initialStates.model);
+    this.display = new CalculatorDisplay(initialStates.display);
+    this.expression = new CalculatorExpression(initialStates.expression);
+    this.history = new CalculatorHistory(this.model, initialStates.history);
 
     this.model.addSubscriber(this.display.subscriber);
     this.model.addSubscriber(this.expression.subscriber);
     this.model.addSubscriber(this.history.subscriber);
     this.model.addSubscriber(this.persistence.subscriber);
-
-    this.initViews();
 
     /* prettier-ignore */
     this.buttons = [
@@ -75,42 +77,6 @@ class Calculator {
     ];
 
     this.root = this.createRoot();
-  }
-
-  private initViews() {
-    const state = this.persistence.load();
-
-    if (!state) {
-      return;
-    }
-
-    if (state.operator) {
-      if (state.secondOperand) {
-        this.display.setNumber(state.secondOperand);
-      }
-    } else {
-      if (state.firstOperand !== null) {
-        this.display.setNumber(state.firstOperand);
-      }
-    }
-
-    if (state.operator && state.firstOperand !== null) {
-      this.expression.setOperator(state.firstOperand, state.operator);
-    }
-
-    state.events.forEach((event) => {
-      if (event.type === "BiOperatorCalculatedEvent") {
-        this.history.addBiOperation(
-          event.firstOperand,
-          event.operator,
-          event.secondOperand,
-        );
-      }
-
-      if (event.type === "UnOperatorCalculatedEvent") {
-        this.history.addUnOperation(event.operand, event.operator);
-      }
-    });
   }
 
   public renderTo(container: Element) {

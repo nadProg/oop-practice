@@ -9,8 +9,12 @@ export class CalculatorDisplay {
 
   public readonly subscriber = new DisplaySubscriber(this);
 
-  constructor() {
+  constructor(initState?: { number: number } | null) {
     this.root = this.createRoot();
+
+    if (initState) {
+      this.setNumber(initState.number);
+    }
   }
 
   public renderTo(container: Element) {

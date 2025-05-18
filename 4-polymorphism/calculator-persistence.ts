@@ -66,7 +66,7 @@ type CalculatorPersistedState = {
   events: (BiOperatorCalculatedEvent | UnOperatorCalculatedEvent)[];
 };
 
-export class CalculatorPersistenceFacade {
+class CalculatorPersistenceFacade {
   private persistence = new CalculatorPersistence();
 
   get subscriber() {
@@ -135,7 +135,92 @@ export class CalculatorPersistenceFacade {
       return null;
     }
   }
+
+  public static getInitialModelState(
+    persistedState: CalculatorPersistedState | null,
+  ) {
+    if (!persistedState) {
+      return null;
+    }
+
+    return {
+      firstOperand: persistedState.firstOperand,
+      operator: persistedState.operator,
+      secondOperand: persistedState.secondOperand,
+    };
+  }
+
+  public static getInitialDisplayState(
+    persistedState: CalculatorPersistedState | null,
+  ) {
+    if (!persistedState) {
+      return null;
+    }
+
+    const { firstOperand, operator, secondOperand } = persistedState;
+
+    if (operator) {
+      if (secondOperand !== null) {
+        return { number: secondOperand };
+      }
+
+      return null;
+    }
+
+    if (firstOperand !== null) {
+      return { number: firstOperand };
+    }
+
+    return null;
+  }
+
+  public static getInitialExpressionState(
+    persistedState: CalculatorPersistedState | null,
+  ) {
+    if (!persistedState) {
+      return null;
+    }
+
+    const { firstOperand, operator } = persistedState;
+
+    if (operator && firstOperand !== null) {
+      return {
+        operator,
+        firstOperand,
+      };
+    }
+
+    return null;
+  }
+
+  public static getInitialHistoryState(
+    persistedState: CalculatorPersistedState | null,
+  ) {
+    if (!persistedState) {
+      return null;
+    }
+
+    return {
+      events: persistedState.events,
+    };
+  }
+
+  public static getInitialCalculatorStates(
+    persistedState: CalculatorPersistedState | null,
+  ) {
+    return {
+      model: CalculatorPersistenceFacade.getInitialModelState(persistedState),
+      display:
+        CalculatorPersistenceFacade.getInitialDisplayState(persistedState),
+      expression:
+        CalculatorPersistenceFacade.getInitialExpressionState(persistedState),
+      history:
+        CalculatorPersistenceFacade.getInitialHistoryState(persistedState),
+    };
+  }
 }
+
+export { CalculatorPersistenceFacade as CalculatorPersistence };
 
 class CalculatorPersistenceSubscriber
   extends BaseCalculatorSubscriber

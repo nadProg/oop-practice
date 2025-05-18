@@ -1,5 +1,7 @@
-import { BaseCalculatorSubscriber } from "./calculator-subscriber";
-import { type CalculatorSubscriber } from "./calculator-subscriber";
+import {
+  BaseCalculatorSubscriber,
+  type CalculatorSubscriber,
+} from "./calculator-subscriber";
 import type { BiOperator } from "./operator";
 import { injectCss } from "./utils";
 
@@ -8,8 +10,14 @@ export class CalculatorExpression {
 
   public readonly subscriber = new ExpressionSubscriber(this);
 
-  constructor() {
+  constructor(
+    initState?: { operator: BiOperator; firstOperand: number } | null,
+  ) {
     this.root = this.createRoot();
+
+    if (initState) {
+      this.setOperator(initState.firstOperand, initState.operator);
+    }
   }
 
   public renderTo(container: Element) {
