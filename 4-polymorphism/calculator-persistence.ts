@@ -12,29 +12,33 @@ const CalculatorStateSchema = z.object({
   secondOperand: z.number().nullable(),
 });
 
-export class CalculatorPersistence extends BaseCalculatorSubscriber
-  implements CalculatorSubscriber {
+export class CalculatorPersistence
+  extends BaseCalculatorSubscriber
+  implements CalculatorSubscriber
+{
   public subscriber = new CalculatorPersistenceSubscriber(this);
   public storage = new LocalStoragePersistence(
     "calculator_state",
     CalculatorStateSchema,
-    {firstOperand: null, secondOperand: null},
-    "1"
-  )
+    { firstOperand: null, secondOperand: null },
+    "1",
+  );
 
   constructor() {
     super();
   }
 }
 
-class CalculatorPersistenceSubscriber extends BaseCalculatorSubscriber
-  implements CalculatorSubscriber {
+class CalculatorPersistenceSubscriber
+  extends BaseCalculatorSubscriber
+  implements CalculatorSubscriber
+{
   constructor(private persistence: CalculatorPersistence) {
     super();
   }
 
   public currentOperandUpdated(operand: number, type: "first" | "second") {
-    if (type === 'first') {
+    if (type === "first") {
       this.persistence.storage.update((prevState) => ({
         ...prevState,
         firstOperand: operand,
@@ -42,7 +46,7 @@ class CalculatorPersistenceSubscriber extends BaseCalculatorSubscriber
       return;
     }
 
-    if (type === 'second') {
+    if (type === "second") {
       this.persistence.storage.update((prevState) => ({
         ...prevState,
         secondOperand: operand,

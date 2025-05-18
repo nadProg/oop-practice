@@ -5,7 +5,9 @@ import type { UnOperator } from "../operator";
 class LogOperator implements UnOperator {
   calculate(firstOperand: number): number {
     if (firstOperand <= 0) {
-      throw new Error("Логарифм определен только для положительных числе больше 0");
+      throw new Error(
+        "Логарифм определен только для положительных числе больше 0",
+      );
     }
 
     return Math.log10(firstOperand);

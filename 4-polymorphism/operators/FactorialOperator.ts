@@ -35,7 +35,7 @@ class FactorialOperator implements UnOperator {
 
 export class FactorialButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
-    super("<i>n</i>!", {serif: true});
+    super("<i>n</i>!", { serif: true });
   }
 
   onClick() {

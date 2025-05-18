@@ -23,7 +23,7 @@ export class CalculatorHistory {
   public addBiOperation(
     firstOperand: number,
     operator: BiOperator,
-    secondOperand: number
+    secondOperand: number,
   ) {
     const historyItem = createElementFromHTML(/*html*/ `
       <div class="calculator_history-item ${operator.getHistoryClass()}">
@@ -85,7 +85,7 @@ export class CalculatorHistory {
         font-weight: bold;
       }
           `,
-      "calculator_history"
+      "calculator_history",
     );
   }
 }
@@ -102,7 +102,7 @@ class HistorySubscriber
     this.history.addBiOperation(
       event.firstOperand,
       event.operator,
-      event.secondOperand
+      event.secondOperand,
     );
   }
 

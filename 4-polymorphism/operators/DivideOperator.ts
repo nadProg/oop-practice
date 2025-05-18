@@ -5,7 +5,7 @@ import { CalculatorButton } from "../button/calculator-button";
 class DivideOperator implements BiOperator {
   calculate(firstOperand: number, secondOperand: number): number {
     if (secondOperand === 0) {
-      throw new Error('Деление на ноль');
+      throw new Error("Деление на ноль");
     }
 
     return firstOperand / secondOperand;
@@ -16,7 +16,7 @@ class DivideOperator implements BiOperator {
   getHistoryText(firstOperand: number, secondOperand: number): string {
     return `${firstOperand} / ${secondOperand} = ${this.calculate(
       firstOperand,
-      secondOperand
+      secondOperand,
     )}`;
   }
   getHistoryClass(): string {

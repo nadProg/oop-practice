@@ -41,7 +41,7 @@ export class CalculatorDisplay {
         border-radius: 3px;
     }
           `,
-      "calculator_display"
+      "calculator_display",
     );
   }
 }

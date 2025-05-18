@@ -12,7 +12,7 @@ class PowOperator implements BiOperator {
   getHistoryText(firstOperand: number, secondOperand: number): string {
     return `${firstOperand} ** ${secondOperand} = ${this.calculate(
       firstOperand,
-      secondOperand
+      secondOperand,
     )}`;
   }
   getHistoryClass(): string {
@@ -22,7 +22,7 @@ class PowOperator implements BiOperator {
 
 export class PowButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
-    super("<i>x<sup> y</sup></i>", {serif: true});
+    super("<i>x<sup> y</sup></i>", { serif: true });
   }
 
   onClick() {

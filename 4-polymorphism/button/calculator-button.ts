@@ -3,8 +3,8 @@ import { formatError, injectCss } from "../utils";
 export abstract class CalculatorButton {
   private root: HTMLButtonElement;
 
-  constructor(innerHtml: string, {serif}: {serif?: boolean} = {}) {
-    this.root = this.createRoot(innerHtml, {serif});
+  constructor(innerHtml: string, { serif }: { serif?: boolean } = {}) {
+    this.root = this.createRoot(innerHtml, { serif });
 
     this.clickListener = this.clickListener.bind(this);
     this.root.addEventListener("click", this.clickListener);
@@ -19,7 +19,7 @@ export abstract class CalculatorButton {
 
   private clickListener() {
     try {
-      this.onClick()
+      this.onClick();
     } catch (error) {
       alert(formatError(error));
     }
@@ -30,7 +30,10 @@ export abstract class CalculatorButton {
     container.append(this.root);
   }
 
-  private createRoot(innerHtml: string, {serif}: {serif: boolean | undefined}) {
+  private createRoot(
+    innerHtml: string,
+    { serif }: { serif: boolean | undefined },
+  ) {
     const root = document.createElement("button");
     root.classList.add("calculator_button");
     if (serif) {
@@ -58,7 +61,7 @@ export abstract class CalculatorButton {
       font-family: serif;
     }
           `,
-      "calculator_button"
+      "calculator_button",
     );
   }
 }

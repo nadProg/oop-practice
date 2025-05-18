@@ -44,7 +44,7 @@ export class CalculatorExpression {
       padding: 5px 10px;
     }
           `,
-      "calculator_expression"
+      "calculator_expression",
     );
   }
 }

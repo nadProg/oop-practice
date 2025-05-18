@@ -24,7 +24,7 @@ export class ClearButton extends CalculatorButton {
         background: gray;
       }
       `,
-      "clear_calculator_button"
+      "clear_calculator_button",
     );
   }
 }

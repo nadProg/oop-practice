@@ -27,13 +27,13 @@ export class CalculatorModel {
       const firstOperand = parseInt(`${this.firstOperand ?? ""}${digitText}`);
       this.firstOperand = firstOperand;
       this.subscribers.forEach((s) =>
-        s.currentOperandUpdated(firstOperand, "first")
+        s.currentOperandUpdated(firstOperand, "first"),
       );
     } else {
       const secondOperand = parseInt(`${this.secondOperand ?? ""}${digitText}`);
       this.secondOperand = secondOperand;
       this.subscribers.forEach((s) =>
-        s.currentOperandUpdated(secondOperand, "second")
+        s.currentOperandUpdated(secondOperand, "second"),
       );
     }
   }
@@ -48,7 +48,7 @@ export class CalculatorModel {
       this.operator = operator;
 
       this.subscribers.forEach((s) =>
-        s.biOperatorAdded(operator, this.firstOperand!)
+        s.biOperatorAdded(operator, this.firstOperand!),
       );
     }
   }
@@ -66,7 +66,7 @@ export class CalculatorModel {
           operand: this.firstOperand!,
           operator,
           result,
-        })
+        }),
       );
 
       this.firstOperand = result;
@@ -87,7 +87,7 @@ export class CalculatorModel {
     ) {
       const result = this.operator.calculate(
         this.firstOperand,
-        this.secondOperand
+        this.secondOperand,
       );
 
       this.subscribers.forEach((s) =>
@@ -96,7 +96,7 @@ export class CalculatorModel {
           operator: this.operator!,
           result,
           secondOperand: this.secondOperand!,
-        })
+        }),
       );
 
       this.firstOperand = result;

@@ -10,7 +10,7 @@ export class ProcessButton extends CalculatorButton {
 
   onClick() {
     if (!this.model.canProcess()) {
-      throw new Error('Can not process')
+      throw new Error("Can not process");
     }
 
     this.model.processCalculation();
@@ -24,7 +24,7 @@ export class ProcessButton extends CalculatorButton {
         background: red;
       }
       `,
-      "process_calculator_button"
+      "process_calculator_button",
     );
   }
 }

@@ -1,9 +1,14 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export class LocalStoragePersistence<Z extends z.ZodTypeAny> {
   private readonly storageKey: string;
 
-  constructor(key: string, private readonly schema: Z, private readonly defaultState: z.output<Z>, version?: string) {
+  constructor(
+    key: string,
+    private readonly schema: Z,
+    private readonly defaultState: z.output<Z>,
+    version?: string,
+  ) {
     this.storageKey = version ? `${key}_v${version}` : key;
   }
 
@@ -13,8 +18,8 @@ export class LocalStoragePersistence<Z extends z.ZodTypeAny> {
       localStorage.setItem(this.storageKey, serialized);
       return true;
     } catch (error) {
-      console.error('Failed to save data to localStorage:', error);
-      return false
+      console.error("Failed to save data to localStorage:", error);
+      return false;
     }
   }
 
@@ -34,7 +39,7 @@ export class LocalStoragePersistence<Z extends z.ZodTypeAny> {
     try {
       return this.load();
     } catch (error) {
-      console.error('Failed to load data from localStorage:', error);
+      console.error("Failed to load data from localStorage:", error);
       return null;
     }
   }
@@ -45,7 +50,7 @@ export class LocalStoragePersistence<Z extends z.ZodTypeAny> {
       this.save(setter(prevState));
       return true;
     } catch (error) {
-      console.error('Failed to update data in localStorage:', error);
+      console.error("Failed to update data in localStorage:", error);
       return false;
     }
   }
@@ -54,7 +59,7 @@ export class LocalStoragePersistence<Z extends z.ZodTypeAny> {
     try {
       localStorage.removeItem(this.storageKey);
     } catch (error) {
-      console.error('Failed to clear data from localStorage:', error);
+      console.error("Failed to clear data from localStorage:", error);
     }
   }
 }

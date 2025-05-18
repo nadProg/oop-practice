@@ -12,7 +12,7 @@ class AddOperator implements BiOperator {
   getHistoryText(firstOperand: number, secondOperand: number): string {
     return `${firstOperand} + ${secondOperand} = ${this.calculate(
       firstOperand,
-      secondOperand
+      secondOperand,
     )}`;
   }
   getHistoryClass(): string {

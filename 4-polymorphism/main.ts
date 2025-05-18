@@ -132,7 +132,7 @@ class Calculator {
         margin: 10px 0;
       }
         `,
-      "calculator"
+      "calculator",
     );
   }
 }
