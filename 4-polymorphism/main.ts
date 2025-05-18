@@ -7,16 +7,18 @@ import { CalculatorDisplay } from "./calculator-display";
 import { CalculatorExpression } from "./calculator-expression";
 import { CalculatorHistory } from "./calculator-history";
 import { CalculatorModel } from "./calculator-model";
+import { CalculatorPersistence } from "./calculator-persistence";
+
 import { AddButton } from "./operators/AddOperator";
 import { CosButton } from "./operators/CosOperator";
 import { DivideButton } from "./operators/DivideOperator";
 import { MultiplyButton } from "./operators/MultiplyOperator";
 import { PowButton } from "./operators/PowOperator";
 import { SubtractButton } from "./operators/SubtractOperator";
-import { injectCss } from "./utils";
 import { SinButton } from "./operators/SinOperator";
 import { LogButton } from "./operators/LogOperator";
 import { FactorialButton } from "./operators/FactorialOperator";
+import { injectCss } from "./utils";
 
 class Calculator {
   private root: HTMLDivElement;
@@ -25,16 +27,21 @@ class Calculator {
   private model: CalculatorModel;
   private history: CalculatorHistory;
   private buttons: CalculatorButton[];
+  private persistence: CalculatorPersistence;
 
   constructor() {
     this.display = new CalculatorDisplay();
     this.expression = new CalculatorExpression();
     this.history = new CalculatorHistory();
-    this.model = new CalculatorModel();
+    this.persistence = new CalculatorPersistence();
+    this.model = new CalculatorModel(this.persistence);
 
     this.model.addSubscriber(this.display.subscriber);
     this.model.addSubscriber(this.expression.subscriber);
     this.model.addSubscriber(this.history.subscriber);
+    this.model.addSubscriber(this.persistence.subscriber);
+
+    this.initViews();
 
     /* prettier-ignore */
     this.buttons = [
@@ -68,6 +75,18 @@ class Calculator {
     ];
 
     this.root = this.createRoot();
+  }
+
+  private initViews() {
+    const state = this.persistence.storage.safeLoad();
+    if (!state) {
+      return;
+    }
+
+    const displayNumber = state.firstOperand;
+    if (displayNumber !== null) {
+      this.display.setNumber(displayNumber);
+    }
   }
 
   public renderTo(container: Element) {

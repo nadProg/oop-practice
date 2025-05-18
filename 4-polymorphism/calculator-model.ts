@@ -1,11 +1,22 @@
 import type { CalculatorSubscriber } from "./calculator-subscriber";
 import type { BiOperator, UnOperator } from "./operator";
+import { CalculatorPersistence } from "./calculator-persistence";
 
 export class CalculatorModel {
   private firstOperand: number | null = null;
   private operator: BiOperator | null = null;
   private secondOperand: number | null = null;
   private subscribers: CalculatorSubscriber[] = [];
+
+  constructor(persistence?: CalculatorPersistence) {
+    if (persistence) {
+      const state = persistence.storage.safeLoad();
+      if (state) {
+        this.firstOperand = state.firstOperand;
+        this.secondOperand = state.secondOperand;
+      }
+    }
+  }
 
   public addSubscriber(subs: CalculatorSubscriber) {
     this.subscribers.push(subs);
