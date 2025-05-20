@@ -1,7 +1,6 @@
 import { CalculatorButton } from "../button/calculator-button";
-import type { AngleUnit } from "../angle-unit";
 import type { CalculatorModel } from "../calculator-model";
-import { AbstractOperator, type UnOperator } from "../operator";
+import { AbstractOperator, type UnOperator, type AngleUnit } from "../operator";
 
 export class SinOperator extends AbstractOperator<"sin"> implements UnOperator {
   constructor() {

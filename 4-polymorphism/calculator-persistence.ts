@@ -7,12 +7,12 @@ import {
 } from "./calculator-subscriber";
 import { LocalStoragePersistence } from "./local-storage-persistence";
 import type { BiOperator } from "./operator";
+import { type AngleUnit, AngleUnitFactory } from "./angle-unit";
 import {
   BiOperatorFactory,
   UnOperatorFactory,
 } from "./operators/operator-factory";
 import { isNever } from "./utils";
-import { type AngleUnit, AngleUnitFactory } from "./angle-unit.ts";
 
 const SerializableBiOperatorSchema = z.object({
   kind: z.literal("bi"),

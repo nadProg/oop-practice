@@ -1,8 +1,11 @@
-import type { AngleUnit } from "./angle-unit";
-
 export type BiOperatorKey = "+" | "-" | "*" | "/" | "^";
 
 export type UnOperatorKey = "sin" | "cos" | "log10" | "n!";
+
+export type AngleUnit = {
+  getRadians(value: number): number;
+  getFunctionIndex(): string;
+};
 
 export class AbstractOperator<K extends BiOperatorKey | UnOperatorKey> {
   constructor(private key: K) {}

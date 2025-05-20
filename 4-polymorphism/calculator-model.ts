@@ -2,6 +2,8 @@ import type { CalculatorSubscriber } from "./calculator-subscriber";
 import type { BiOperator, UnOperator } from "./operator";
 import { type AngleUnit, RadAngleUnit } from "./angle-unit";
 
+type PublicAngleUnit = Omit<AngleUnit, "toggle">;
+
 export class CalculatorModel {
   private firstOperand: number | null = null;
   private operator: BiOperator | null = null;
@@ -122,11 +124,11 @@ export class CalculatorModel {
     this.subscribers.forEach((s) => s.historyCleared());
   }
 
-  public getAngleUnit(): AngleUnit {
+  public getAngleUnit(): PublicAngleUnit {
     return this.angleUnit;
   }
 
-  public toggleAngleUnit(): AngleUnit {
+  public toggleAngleUnit(): PublicAngleUnit {
     this.angleUnit = this.angleUnit.toggle();
     this.subscribers.forEach((s) => s.angleUnitUpdated(this.angleUnit));
     return this.angleUnit;
