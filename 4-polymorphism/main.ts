@@ -1,6 +1,7 @@
 import { CalculatorButton } from "./button/calculator-button";
 import { ClearButton } from "./button/clear-button";
 import { NumberButton } from "./button/number-button";
+import { AngleUnitButton } from "./button/angle-unit-button.ts";
 
 import { ProcessButton } from "./button/process-button";
 import { CalculatorDisplay } from "./calculator-display";
@@ -28,6 +29,7 @@ class Calculator {
   private history: CalculatorHistory;
   private buttons: CalculatorButton[];
   private persistence: CalculatorPersistence;
+  private angleModeButton: AngleUnitButton;
 
   constructor() {
     this.persistence = new CalculatorPersistence();
@@ -39,6 +41,7 @@ class Calculator {
     this.display = new CalculatorDisplay(initialStates.display);
     this.expression = new CalculatorExpression(initialStates.expression);
     this.history = new CalculatorHistory(this.model, initialStates.history);
+    this.angleModeButton = new AngleUnitButton(this.model);
 
     this.model.addSubscriber(this.display.subscriber);
     this.model.addSubscriber(this.expression.subscriber);
@@ -90,6 +93,7 @@ class Calculator {
 
     this.expression.renderTo(root);
     this.display.renderTo(root);
+    this.angleModeButton.renderTo(root);
 
     const buttonsContainer = document.createElement("div");
     buttonsContainer.classList.add("calculator_buttons");

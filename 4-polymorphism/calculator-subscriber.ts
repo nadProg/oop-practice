@@ -1,12 +1,14 @@
 import type { BiOperator, UnOperator } from "./operator";
+import type { AngleUnit } from "./angle-unit";
 
 export interface CalculatorSubscriber {
   currentOperandUpdated(operand: number, type: "first" | "second"): void;
   biOperatorAdded(operator: BiOperator, firstOperand: number): void;
-  unOperatorCalculated(event: UnOperatorCalculatedEvent): void;
-  biOperatorCalculated(event: BiOperatorCalculatedEvent): void;
+  unOperatorCalculated(e: UnOperatorCalculatedEvent): void;
+  biOperatorCalculated(e: BiOperatorCalculatedEvent): void;
   cleared(): void;
   historyCleared(): void;
+  angleUnitUpdated(angleUnit: AngleUnit): void;
 }
 
 export type UnOperatorCalculatedEvent = {
@@ -31,4 +33,5 @@ export class BaseCalculatorSubscriber implements CalculatorSubscriber {
   unOperatorCalculated(_: UnOperatorCalculatedEvent): void {}
   cleared(): void {}
   historyCleared(): void {}
+  angleUnitUpdated(_: AngleUnit): void {}
 }

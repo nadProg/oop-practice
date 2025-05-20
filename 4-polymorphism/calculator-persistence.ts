@@ -230,6 +230,7 @@ class CalculatorPersistenceFacade {
       firstOperand: persistedState.firstOperand,
       operator: persistedState.operator,
       secondOperand: persistedState.secondOperand,
+      angleUnit: null,
     };
   }
 
