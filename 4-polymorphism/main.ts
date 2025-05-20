@@ -31,8 +31,8 @@ class Calculator {
   private persistence: CalculatorPersistence;
   private angleModeButton: AngleUnitButton;
 
-  constructor() {
-    this.persistence = new CalculatorPersistence();
+  constructor(key: string) {
+    this.persistence = new CalculatorPersistence(key);
     const initialStates = CalculatorPersistence.getInitialCalculatorStates(
       this.persistence.load(),
     );
@@ -131,8 +131,8 @@ class Calculator {
   }
 }
 
-const calculator1 = new Calculator();
+const calculator1 = new Calculator("calculator-1");
 calculator1.renderTo(document.body);
 
-const calculator2 = new Calculator();
+const calculator2 = new Calculator("calculator-2");
 calculator2.renderTo(document.body);

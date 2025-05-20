@@ -52,23 +52,26 @@ const CalculatorSerializableStateSchema = z.object({
     .array(),
 });
 
-class CalculatorPersistence
-  extends BaseCalculatorSubscriber
-  implements CalculatorSubscriber
-{
+class CalculatorPersistence {
   public subscriber = new CalculatorPersistenceSubscriber(this);
-  public storage = new LocalStoragePersistence(
-    "calculator_state",
-    CalculatorSerializableStateSchema,
-    {
-      firstOperand: null,
-      operator: null,
-      secondOperand: null,
-      angleUnit: null,
-      events: [],
-    },
-    "1",
-  );
+  public storage: LocalStoragePersistence<
+    typeof CalculatorSerializableStateSchema
+  >;
+
+  constructor(key: string, version?: string | number) {
+    this.storage = new LocalStoragePersistence(
+      key,
+      CalculatorSerializableStateSchema,
+      {
+        firstOperand: null,
+        operator: null,
+        secondOperand: null,
+        angleUnit: null,
+        events: [],
+      },
+      version,
+    );
+  }
 }
 
 type CalculatorPersistedState = {
@@ -170,7 +173,11 @@ class CalculatorPersistenceSubscriber
 }
 
 class CalculatorPersistenceFacade {
-  private persistence = new CalculatorPersistence();
+  private persistence: CalculatorPersistence;
+
+  constructor(key: string, version?: string | number) {
+    this.persistence = new CalculatorPersistence(key, version);
+  }
 
   get subscriber() {
     return this.persistence.subscriber;

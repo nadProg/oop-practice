@@ -7,7 +7,7 @@ export class LocalStoragePersistence<Z extends z.ZodTypeAny> {
     key: string,
     private readonly schema: Z,
     private readonly defaultState: z.output<Z>,
-    version?: string,
+    version?: string | number,
   ) {
     this.storageKey = version ? `${key}_v${version}` : key;
   }
