@@ -1,18 +1,19 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
 import { AbstractOperator, type UnOperator } from "../operator";
+import type { AngleUnit } from "../angle-unit";
 
 export class CosOperator extends AbstractOperator<"cos"> implements UnOperator {
   constructor() {
     super("cos");
   }
 
-  calculate(firstOperand: number): number {
-    return Math.cos(firstOperand);
+  calculate(firstOperand: number, angleUnit: AngleUnit): number {
+    return Math.cos(angleUnit.getRadians(firstOperand));
   }
 
-  getHistoryText(firstOperand: number): string {
-    return `cos(${firstOperand}) = ${this.calculate(firstOperand)}`;
+  getHistoryText(firstOperand: number, angleUnit: AngleUnit): string {
+    return `cos<sub>${angleUnit.getFunctionIndex()}</sub>(${firstOperand}) = ${this.calculate(firstOperand, angleUnit)}`;
   }
 
   getHistoryClass(): string {

@@ -64,7 +64,7 @@ export class CalculatorModel {
       this.operator === null &&
       this.secondOperand === null
     ) {
-      const result = operator.calculate(this.firstOperand);
+      const result = operator.calculate(this.firstOperand, this.angleUnit);
 
       this.subscribers.forEach((s) =>
         s.unOperatorCalculated({

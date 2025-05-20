@@ -1,3 +1,5 @@
+import type { AngleUnit } from "./angle-unit";
+
 export type BiOperatorKey = "+" | "-" | "*" | "/" | "^";
 
 export type UnOperatorKey = "sin" | "cos" | "log10" | "n!";
@@ -20,7 +22,7 @@ export interface BiOperator {
 
 export interface UnOperator {
   getKey(): UnOperatorKey;
-  calculate(firstOperand: number): number;
-  getHistoryText(firstOperand: number): string;
+  calculate(firstOperand: number, angleUnit: AngleUnit): number;
+  getHistoryText(firstOperand: number, angleUnit: AngleUnit): string;
   getHistoryClass(): string;
 }

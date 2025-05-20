@@ -6,10 +6,7 @@ import {
 } from "./calculator-subscriber";
 import type { BiOperator, UnOperator } from "./operator";
 import { createElementFromHTML, injectCss } from "./utils";
-
-interface WithClearHistory {
-  clearHistory(): void;
-}
+import type { CalculatorModel } from "./calculator-model";
 
 export class CalculatorHistory {
   private root: HTMLDivElement;
@@ -17,7 +14,7 @@ export class CalculatorHistory {
   public subscriber = new HistorySubscriber(this);
 
   constructor(
-    model: WithClearHistory,
+    private model: CalculatorModel,
     initState?: {
       events: (BiOperatorCalculatedEvent | UnOperatorCalculatedEvent)[];
     } | null,
@@ -25,7 +22,7 @@ export class CalculatorHistory {
     this.clearButton = this.createClearButton();
     this.root = this.createRoot();
     this.root.append(this.clearButton);
-    this.clearButton.addEventListener("click", () => model.clearHistory());
+    this.clearButton.addEventListener("click", () => this.model.clearHistory());
 
     if (initState) {
       this.initEvents(initState.events);
@@ -72,7 +69,7 @@ export class CalculatorHistory {
   public addUnOperation(firstOperand: number, operator: UnOperator) {
     const historyItem = createElementFromHTML(/*html*/ `
       <div class="calculator_history-item ${operator.getHistoryClass()}">
-        ${operator.getHistoryText(firstOperand)}
+        ${operator.getHistoryText(firstOperand, this.model.getAngleUnit())}
       </div>
       `);
 

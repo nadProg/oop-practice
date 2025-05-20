@@ -12,6 +12,7 @@ import {
   UnOperatorFactory,
 } from "./operators/operator-factory";
 import { isNever } from "./utils";
+import { type AngleUnit, AngleUnitFactory } from "./angle-unit.ts";
 
 const SerializableBiOperatorSchema = z.object({
   kind: z.literal("bi"),
@@ -23,10 +24,15 @@ const SerializableUnOperatorSchema = z.object({
   key: z.enum(["sin", "cos", "n!", "log10"]),
 });
 
+const SerializableAngleUnitSchema = z.object({
+  key: z.enum(["DEG", "RAD"]),
+});
+
 const CalculatorSerializableStateSchema = z.object({
   firstOperand: z.number().nullable(),
   operator: SerializableBiOperatorSchema.nullable(),
   secondOperand: z.number().nullable(),
+  angleUnit: SerializableAngleUnitSchema.nullable(),
   events: z
     .discriminatedUnion("type", [
       z.object({
@@ -54,7 +60,13 @@ class CalculatorPersistence
   public storage = new LocalStoragePersistence(
     "calculator_state",
     CalculatorSerializableStateSchema,
-    { firstOperand: null, operator: null, secondOperand: null, events: [] },
+    {
+      firstOperand: null,
+      operator: null,
+      secondOperand: null,
+      angleUnit: null,
+      events: [],
+    },
     "1",
   );
 }
@@ -63,6 +75,7 @@ type CalculatorPersistedState = {
   firstOperand: number | null;
   operator: BiOperator | null;
   secondOperand: number | null;
+  angleUnit: AngleUnit | null;
   events: (BiOperatorCalculatedEvent | UnOperatorCalculatedEvent)[];
 };
 
@@ -132,6 +145,13 @@ class CalculatorPersistenceSubscriber
     }));
   }
 
+  public angleUnitUpdated(angleUnit: AngleUnit) {
+    this.persistence.storage.update((prevState) => ({
+      ...prevState,
+      angleUnit: AngleUnitFactory.toSerializable(angleUnit),
+    }));
+  }
+
   public cleared(): void {
     this.persistence.storage.update((prevState) => ({
       ...prevState,
@@ -166,6 +186,9 @@ class CalculatorPersistenceFacade {
 
       return {
         ...serializableState,
+        angleUnit: serializableState.angleUnit
+          ? AngleUnitFactory.fromSerializable(serializableState.angleUnit)
+          : null,
         operator: serializableState.operator
           ? BiOperatorFactory.fromSerializable(serializableState.operator)
           : null,
@@ -230,7 +253,7 @@ class CalculatorPersistenceFacade {
       firstOperand: persistedState.firstOperand,
       operator: persistedState.operator,
       secondOperand: persistedState.secondOperand,
-      angleUnit: null,
+      angleUnit: persistedState.angleUnit,
     };
   }
 
