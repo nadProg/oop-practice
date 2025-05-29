@@ -1,4 +1,22 @@
+export type BiOperatorKey = "+" | "-" | "*" | "/" | "^";
+
+export type UnOperatorKey = "sin" | "cos" | "log10" | "n!";
+
+export type AngleUnit = {
+  getRadians(value: number): number;
+  getFunctionIndex(): string;
+};
+
+export class AbstractOperator<K extends BiOperatorKey | UnOperatorKey> {
+  constructor(private key: K) {}
+
+  public getKey(): K {
+    return this.key;
+  }
+}
+
 export interface BiOperator {
+  getKey(): BiOperatorKey;
   calculate(firstOperand: number, secondOperand: number): number;
   getExpression(firstOperand: number): string;
   getHistoryText(firstOperand: number, secondOperand: number): string;
@@ -6,7 +24,8 @@ export interface BiOperator {
 }
 
 export interface UnOperator {
-  calculate(firstOperand: number): number;
-  getHistoryText(firstOperand: number): string;
+  getKey(): UnOperatorKey;
+  calculate(firstOperand: number, angleUnit: AngleUnit): number;
+  getHistoryText(firstOperand: number, angleUnit: AngleUnit): string;
   getHistoryClass(): string;
 }

@@ -1,8 +1,15 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
-import type { BiOperator } from "../operator";
+import { AbstractOperator, type BiOperator } from "../operator";
 
-class SubscractOperator implements BiOperator {
+export class SubtractOperator
+  extends AbstractOperator<"-">
+  implements BiOperator
+{
+  constructor() {
+    super("-");
+  }
+
   calculate(firstOperand: number, secondOperand: number): number {
     return firstOperand - secondOperand;
   }
@@ -12,20 +19,20 @@ class SubscractOperator implements BiOperator {
   getHistoryText(firstOperand: number, secondOperand: number): string {
     return `${firstOperand} - ${secondOperand} = ${this.calculate(
       firstOperand,
-      secondOperand
+      secondOperand,
     )}`;
   }
   getHistoryClass(): string {
-    return `substract`;
+    return `subtract`;
   }
 }
 
-export class SubscractButton extends CalculatorButton {
+export class SubtractButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
     super("-");
   }
 
   onClick() {
-    this.model.addBiOperator(new SubscractOperator());
+    this.model.addBiOperator(new SubtractOperator());
   }
 }

@@ -1,5 +1,5 @@
 export function createElementFromHTML<T extends HTMLElement = HTMLDivElement>(
-  htmlString: string
+  htmlString: string,
 ): T {
   var div = document.createElement("div");
   div.innerHTML = htmlString.trim();
@@ -9,7 +9,7 @@ export function createElementFromHTML<T extends HTMLElement = HTMLDivElement>(
 export function injectCss(css: string, id: string) {
   if (
     document.adoptedStyleSheets.find(
-      (sheet) => (sheet as unknown as { id: string }).id === id
+      (sheet) => (sheet as unknown as { id: string }).id === id,
     )
   ) {
     return;
@@ -22,3 +22,15 @@ export function injectCss(css: string, id: string) {
   styleSheet.replaceSync(css);
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, styleSheet];
 }
+
+export const formatError = (error: unknown) => {
+  let message = String(error);
+
+  if (message.startsWith("Error:")) {
+    message = message.slice(6);
+  }
+
+  return message.trim();
+};
+
+export const isNever = (never: never): never => never;

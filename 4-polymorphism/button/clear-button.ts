@@ -5,7 +5,7 @@ import { CalculatorButton } from "./calculator-button";
 export class ClearButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
     super("C");
-    super.addClass("clear_calculator_button");
+    this.addClass("clear_calculator_button");
   }
 
   onClick(): void {
@@ -24,7 +24,7 @@ export class ClearButton extends CalculatorButton {
         background: gray;
       }
       `,
-      "clear_calculator_button"
+      "clear_calculator_button",
     );
   }
 }

@@ -1,11 +1,35 @@
 import type { CalculatorSubscriber } from "./calculator-subscriber";
 import type { BiOperator, UnOperator } from "./operator";
+import { type AngleUnit, RadAngleUnit } from "./angle-unit";
+
+type InitState = {
+  firstOperand: number | null;
+  operator: BiOperator | null;
+  secondOperand: number | null;
+  angleUnit: AngleUnit | null;
+};
 
 export class CalculatorModel {
   private firstOperand: number | null = null;
   private operator: BiOperator | null = null;
   private secondOperand: number | null = null;
   private subscribers: CalculatorSubscriber[] = [];
+  private angleUnit: AngleUnit = new RadAngleUnit();
+
+  public init(initState?: InitState | null) {
+    this.firstOperand = initState?.firstOperand ?? null;
+    this.operator = initState?.operator ?? null;
+    this.secondOperand = initState?.secondOperand ?? null;
+    this.angleUnit = initState?.angleUnit ?? this.angleUnit;
+    this.subscribers.forEach((s) =>
+      s.modelInitialized({
+        firstOperand: this.firstOperand,
+        secondOperand: this.secondOperand,
+        operator: this.operator,
+        angleUnit: this.angleUnit,
+      }),
+    );
+  }
 
   public addSubscriber(subs: CalculatorSubscriber) {
     this.subscribers.push(subs);
@@ -16,20 +40,20 @@ export class CalculatorModel {
       const firstOperand = parseInt(`${this.firstOperand ?? ""}${digitText}`);
       this.firstOperand = firstOperand;
       this.subscribers.forEach((s) =>
-        s.curentOperandUpdated(firstOperand, "first")
+        s.currentOperandUpdated(firstOperand, "first"),
       );
     } else {
       const secondOperand = parseInt(`${this.secondOperand ?? ""}${digitText}`);
       this.secondOperand = secondOperand;
       this.subscribers.forEach((s) =>
-        s.curentOperandUpdated(secondOperand, "second")
+        s.currentOperandUpdated(secondOperand, "second"),
       );
     }
   }
 
   public addBiOperator(operator: BiOperator) {
     if (this.firstOperand && this.operator && this.secondOperand) {
-      this.processCaclucation();
+      this.processCalculation();
       this.addBiOperator(operator);
     }
 
@@ -37,7 +61,7 @@ export class CalculatorModel {
       this.operator = operator;
 
       this.subscribers.forEach((s) =>
-        s.biOperatorAdded(operator, this.firstOperand!)
+        s.biOperatorAdded(operator, this.firstOperand!),
       );
     }
   }
@@ -48,14 +72,16 @@ export class CalculatorModel {
       this.operator === null &&
       this.secondOperand === null
     ) {
-      const result = operator.calculate(this.firstOperand);
+      const result = operator.calculate(this.firstOperand, this.angleUnit);
 
       this.subscribers.forEach((s) =>
         s.unOperatorCalculated({
+          type: "UnOperatorCalculatedEvent",
           operand: this.firstOperand!,
           operator,
           result,
-        })
+          angleUnit: this.angleUnit,
+        }),
       );
 
       this.firstOperand = result;
@@ -68,7 +94,7 @@ export class CalculatorModel {
     );
   }
 
-  public processCaclucation() {
+  public processCalculation() {
     if (
       this.firstOperand !== null &&
       this.operator &&
@@ -76,16 +102,17 @@ export class CalculatorModel {
     ) {
       const result = this.operator.calculate(
         this.firstOperand,
-        this.secondOperand
+        this.secondOperand,
       );
 
       this.subscribers.forEach((s) =>
         s.biOperatorCalculated({
+          type: "BiOperatorCalculatedEvent",
           firstOperand: this.firstOperand!,
           operator: this.operator!,
           result,
           secondOperand: this.secondOperand!,
-        })
+        }),
       );
 
       this.firstOperand = result;
@@ -98,5 +125,14 @@ export class CalculatorModel {
     this.firstOperand = null;
     this.operator = null;
     this.subscribers.forEach((s) => s.cleared());
+  }
+
+  public clearHistory() {
+    this.subscribers.forEach((s) => s.historyCleared());
+  }
+
+  public toggleAngleUnit(): void {
+    this.angleUnit = this.angleUnit.toggle();
+    this.subscribers.forEach((s) => s.angleUnitUpdated(this.angleUnit));
   }
 }

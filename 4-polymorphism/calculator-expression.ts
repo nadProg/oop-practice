@@ -1,12 +1,14 @@
-import { BaseCalculatorSubscriber } from "./calculator-subscriber";
-import { type CalculatorSubscriber } from "./calculator-subscriber";
-import type { BiOperator } from "./operator";
+import {
+  BaseCalculatorSubscriber,
+  type CalculatorSubscriber,
+} from "./calculator-subscriber";
 import { injectCss } from "./utils";
+import type { BiOperator } from "./operator";
 
 export class CalculatorExpression {
   private root: HTMLDivElement;
 
-  public readonly subscriber = new ExpresssionSubscriber(this);
+  public readonly subscriber = new ExpressionSubscriber(this);
 
   constructor() {
     this.root = this.createRoot();
@@ -18,17 +20,17 @@ export class CalculatorExpression {
   }
 
   public setOperator(firstOperand: number, operator: BiOperator) {
-    this.root.innerText = operator.getExpression(firstOperand);
+    this.root.innerHTML = operator.getExpression(firstOperand);
   }
 
   public clear() {
-    this.root.innerText = "";
+    this.root.innerHTML = "";
   }
 
   private createRoot() {
     const root = document.createElement("div");
     root.classList.add("calculator_expression");
-    root.innerText = "";
+    root.innerHTML = "";
     return root;
   }
 
@@ -37,34 +39,47 @@ export class CalculatorExpression {
       /* css*/ `
     .calculator_expression {
       font-size: 18px;
+      font-family: monospace;
       color: #666;
       margin-bottom: 5px;
       min-height: 24px;
       padding: 5px 10px;
     }
           `,
-      "calculator_expression"
+      "calculator_expression",
     );
   }
 }
 
-class ExpresssionSubscriber
+class ExpressionSubscriber
   extends BaseCalculatorSubscriber
   implements CalculatorSubscriber
 {
-  constructor(private expresssion: CalculatorExpression) {
+  constructor(private expression: CalculatorExpression) {
     super();
   }
 
+  modelInitialized({
+    firstOperand,
+    operator,
+  }: {
+    firstOperand: number | null;
+    operator: BiOperator | null;
+  }): void {
+    if (operator && firstOperand !== null) {
+      this.expression.setOperator(firstOperand, operator);
+    }
+  }
+
   biOperatorAdded(operator: BiOperator, operand: number): void {
-    this.expresssion.setOperator(operand, operator);
+    this.expression.setOperator(operand, operator);
   }
 
   biOperatorCalculated(): void {
-    this.expresssion.clear();
+    this.expression.clear();
   }
 
   cleared(): void {
-    this.expresssion.clear();
+    this.expression.clear();
   }
 }

@@ -1,9 +1,20 @@
-import { CalculatorButton } from "../button/calculator-button";
+import { AbstractOperator, type BiOperator } from "../operator";
 import type { CalculatorModel } from "../calculator-model";
-import type { BiOperator } from "../operator";
+import { CalculatorButton } from "../button/calculator-button";
 
-class DivideOperator implements BiOperator {
+export class DivideOperator
+  extends AbstractOperator<"/">
+  implements BiOperator
+{
+  constructor() {
+    super("/");
+  }
+
   calculate(firstOperand: number, secondOperand: number): number {
+    if (secondOperand === 0) {
+      throw new Error("Деление на ноль");
+    }
+
     return firstOperand / secondOperand;
   }
   getExpression(firstOperand: number): string {
@@ -12,7 +23,7 @@ class DivideOperator implements BiOperator {
   getHistoryText(firstOperand: number, secondOperand: number): string {
     return `${firstOperand} / ${secondOperand} = ${this.calculate(
       firstOperand,
-      secondOperand
+      secondOperand,
     )}`;
   }
   getHistoryClass(): string {

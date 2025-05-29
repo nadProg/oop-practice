@@ -1,6 +1,4 @@
 // Процедурный калькулятор
-import "lodash";
-
 let display: HTMLElement | null = null;
 let expressionElement: HTMLElement | null = null;
 let historyElement: HTMLElement | null = null;

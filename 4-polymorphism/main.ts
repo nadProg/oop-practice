@@ -1,18 +1,24 @@
 import { CalculatorButton } from "./button/calculator-button";
 import { ClearButton } from "./button/clear-button";
 import { NumberButton } from "./button/number-button";
+import { AngleUnitButton } from "./button/angle-unit-button.ts";
 
 import { ProcessButton } from "./button/process-button";
 import { CalculatorDisplay } from "./calculator-display";
 import { CalculatorExpression } from "./calculator-expression";
 import { CalculatorHistory } from "./calculator-history";
 import { CalculatorModel } from "./calculator-model";
+import { CalculatorPersistence } from "./calculator-persistence";
+
 import { AddButton } from "./operators/AddOperator";
 import { CosButton } from "./operators/CosOperator";
 import { DivideButton } from "./operators/DivideOperator";
 import { MultiplyButton } from "./operators/MultiplyOperator";
 import { PowButton } from "./operators/PowOperator";
-import { SubscractButton } from "./operators/SubscractOperator";
+import { SubtractButton } from "./operators/SubtractOperator";
+import { SinButton } from "./operators/SinOperator";
+import { LogButton } from "./operators/LogOperator";
+import { FactorialButton } from "./operators/FactorialOperator";
 import { injectCss } from "./utils";
 
 class Calculator {
@@ -22,16 +28,26 @@ class Calculator {
   private model: CalculatorModel;
   private history: CalculatorHistory;
   private buttons: CalculatorButton[];
+  private persistence: CalculatorPersistence;
+  private angleModeButton: AngleUnitButton;
 
-  constructor() {
+  constructor(key: string) {
+    this.persistence = new CalculatorPersistence(key);
+    const initialStates = this.persistence.getInitialStates();
+
+    this.model = new CalculatorModel();
     this.display = new CalculatorDisplay();
     this.expression = new CalculatorExpression();
-    this.history = new CalculatorHistory();
-    this.model = new CalculatorModel();
+    this.history = new CalculatorHistory(this.model, initialStates?.history);
+    this.angleModeButton = new AngleUnitButton(this.model);
 
     this.model.addSubscriber(this.display.subscriber);
     this.model.addSubscriber(this.expression.subscriber);
     this.model.addSubscriber(this.history.subscriber);
+    this.model.addSubscriber(this.persistence.subscriber);
+    this.model.addSubscriber(this.angleModeButton.subscriber);
+
+    this.model.init(initialStates?.model);
 
     /* prettier-ignore */
     this.buttons = [
@@ -49,7 +65,7 @@ class Calculator {
       new NumberButton("1", this.model),
       new NumberButton("2", this.model),
       new NumberButton("3", this.model),
-      new SubscractButton(this.model),
+      new SubtractButton(this.model),
       // 4 row
       new NumberButton("0", this.model),
       new ClearButton(this.model),
@@ -57,7 +73,11 @@ class Calculator {
       new AddButton(this.model),
       // 5 row
       new PowButton(this.model),
-      new CosButton(this.model)
+      new CosButton(this.model),
+      new SinButton(this.model),
+      new LogButton(this.model),
+      // 6 row
+      new FactorialButton(this.model)
     ];
 
     this.root = this.createRoot();
@@ -74,6 +94,7 @@ class Calculator {
 
     this.expression.renderTo(root);
     this.display.renderTo(root);
+    this.angleModeButton.renderTo(root);
 
     const buttonsContainer = document.createElement("div");
     buttonsContainer.classList.add("calculator_buttons");
@@ -106,13 +127,13 @@ class Calculator {
         margin: 10px 0;
       }
         `,
-      "calculator"
+      "calculator",
     );
   }
 }
 
-const calculator1 = new Calculator();
+const calculator1 = new Calculator("calculator-1");
 calculator1.renderTo(document.body);
 
-const calculator2 = new Calculator();
+const calculator2 = new Calculator("calculator-2");
 calculator2.renderTo(document.body);

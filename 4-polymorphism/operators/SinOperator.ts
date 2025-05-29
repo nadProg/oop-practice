@@ -2,17 +2,17 @@ import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
 import { AbstractOperator, type UnOperator, type AngleUnit } from "../operator";
 
-export class CosOperator extends AbstractOperator<"cos"> implements UnOperator {
+export class SinOperator extends AbstractOperator<"sin"> implements UnOperator {
   constructor() {
-    super("cos");
+    super("sin");
   }
 
   calculate(firstOperand: number, angleUnit: AngleUnit): number {
-    return Math.cos(angleUnit.getRadians(firstOperand));
+    return Math.sin(angleUnit.getRadians(firstOperand));
   }
 
   getHistoryText(firstOperand: number, angleUnit: AngleUnit): string {
-    return `cos<sub>${angleUnit.getFunctionIndex()}</sub>(${firstOperand}) = ${this.calculate(firstOperand, angleUnit)}`;
+    return `sin<sub>${angleUnit.getFunctionIndex()}</sub>(${firstOperand}) = ${this.calculate(firstOperand, angleUnit)}`;
   }
 
   getHistoryClass(): string {
@@ -20,12 +20,12 @@ export class CosOperator extends AbstractOperator<"cos"> implements UnOperator {
   }
 }
 
-export class CosButton extends CalculatorButton {
+export class SinButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
-    super("cos");
+    super("sin");
   }
 
   onClick() {
-    this.model.addUnOperator(new CosOperator());
+    this.model.addUnOperator(new SinOperator());
   }
 }

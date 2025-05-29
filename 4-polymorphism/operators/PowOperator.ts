@@ -1,8 +1,12 @@
 import { CalculatorButton } from "../button/calculator-button";
 import type { CalculatorModel } from "../calculator-model";
-import type { BiOperator } from "../operator";
+import { AbstractOperator, type BiOperator } from "../operator";
 
-class PowOperator implements BiOperator {
+export class PowOperator extends AbstractOperator<"^"> implements BiOperator {
+  constructor() {
+    super("^");
+  }
+
   calculate(firstOperand: number, secondOperand: number): number {
     return firstOperand ** secondOperand;
   }
@@ -12,7 +16,7 @@ class PowOperator implements BiOperator {
   getHistoryText(firstOperand: number, secondOperand: number): string {
     return `${firstOperand} ** ${secondOperand} = ${this.calculate(
       firstOperand,
-      secondOperand
+      secondOperand,
     )}`;
   }
   getHistoryClass(): string {
@@ -22,7 +26,7 @@ class PowOperator implements BiOperator {
 
 export class PowButton extends CalculatorButton {
   constructor(private model: CalculatorModel) {
-    super("^");
+    super("<i>x<sup> y</sup></i>", { serif: true });
   }
 
   onClick() {

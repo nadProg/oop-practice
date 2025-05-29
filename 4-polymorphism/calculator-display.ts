@@ -1,13 +1,21 @@
-import type { CalculatorSubscriber } from "./calculator-subscriber";
+import {
+  BaseCalculatorSubscriber,
+  type CalculatorSubscriber,
+} from "./calculator-subscriber";
 import { injectCss } from "./utils";
+import type { BiOperator } from "./operator";
 
 export class CalculatorDisplay {
   private root: HTMLDivElement;
 
   public readonly subscriber = new DisplaySubscriber(this);
 
-  constructor() {
+  constructor(initState?: { number: number } | null) {
     this.root = this.createRoot();
+
+    if (initState) {
+      this.setNumber(initState.number);
+    }
   }
 
   public renderTo(container: Element) {
@@ -41,15 +49,42 @@ export class CalculatorDisplay {
         border-radius: 3px;
     }
           `,
-      "calculator_display"
+      "calculator_display",
     );
   }
 }
 
-class DisplaySubscriber implements CalculatorSubscriber {
-  constructor(private display: CalculatorDisplay) {}
+class DisplaySubscriber
+  extends BaseCalculatorSubscriber
+  implements CalculatorSubscriber
+{
+  constructor(private display: CalculatorDisplay) {
+    super();
+  }
 
-  curentOperandUpdated(operand: number): void {
+  modelInitialized({
+    firstOperand,
+    secondOperand,
+    operator,
+  }: {
+    firstOperand: number | null;
+    operator: BiOperator | null;
+    secondOperand: number | null;
+  }) {
+    if (operator) {
+      if (secondOperand !== null) {
+        return this.display.setNumber(secondOperand);
+      }
+
+      return null;
+    }
+
+    if (firstOperand !== null) {
+      return this.display.setNumber(firstOperand);
+    }
+  }
+
+  currentOperandUpdated(operand: number): void {
     this.display.setNumber(operand);
   }
 
