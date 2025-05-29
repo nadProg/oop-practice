@@ -2,7 +2,12 @@ import type { CalculatorSubscriber } from "./calculator-subscriber";
 import type { BiOperator, UnOperator } from "./operator";
 import { type AngleUnit, RadAngleUnit } from "./angle-unit";
 
-type PublicAngleUnit = Omit<AngleUnit, "toggle">;
+type InitState = {
+  firstOperand: number | null;
+  operator: BiOperator | null;
+  secondOperand: number | null;
+  angleUnit: AngleUnit | null;
+};
 
 export class CalculatorModel {
   private firstOperand: number | null = null;
@@ -11,18 +16,19 @@ export class CalculatorModel {
   private subscribers: CalculatorSubscriber[] = [];
   private angleUnit: AngleUnit = new RadAngleUnit();
 
-  constructor(
-    initState?: {
-      firstOperand: number | null;
-      operator: BiOperator | null;
-      secondOperand: number | null;
-      angleUnit: AngleUnit | null;
-    } | null,
-  ) {
+  public init(initState?: InitState | null) {
     this.firstOperand = initState?.firstOperand ?? null;
     this.operator = initState?.operator ?? null;
     this.secondOperand = initState?.secondOperand ?? null;
     this.angleUnit = initState?.angleUnit ?? this.angleUnit;
+    this.subscribers.forEach((s) =>
+      s.modelInitialized({
+        firstOperand: this.firstOperand,
+        secondOperand: this.secondOperand,
+        operator: this.operator,
+        angleUnit: this.angleUnit,
+      }),
+    );
   }
 
   public addSubscriber(subs: CalculatorSubscriber) {
@@ -74,6 +80,7 @@ export class CalculatorModel {
           operand: this.firstOperand!,
           operator,
           result,
+          angleUnit: this.angleUnit,
         }),
       );
 
@@ -124,13 +131,8 @@ export class CalculatorModel {
     this.subscribers.forEach((s) => s.historyCleared());
   }
 
-  public getAngleUnit(): PublicAngleUnit {
-    return this.angleUnit;
-  }
-
-  public toggleAngleUnit(): PublicAngleUnit {
+  public toggleAngleUnit(): void {
     this.angleUnit = this.angleUnit.toggle();
     this.subscribers.forEach((s) => s.angleUnitUpdated(this.angleUnit));
-    return this.angleUnit;
   }
 }

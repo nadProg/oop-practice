@@ -1,13 +1,22 @@
 import { injectCss } from "../utils";
 import type { CalculatorModel } from "../calculator-model";
+import {
+  BaseCalculatorSubscriber,
+  type CalculatorSubscriber,
+} from "../calculator-subscriber.ts";
+
+type AngleUnit = {
+  getLabel: () => string;
+};
 
 export class AngleUnitButton {
   private root: HTMLButtonElement;
 
+  public readonly subscriber = new AngleUnitButtonSubscriber(this);
+
   constructor(private model: CalculatorModel) {
     this.root = this.createRoot();
     this.initCss();
-    this.updateLabel();
   }
 
   public renderTo(container: Element) {
@@ -22,15 +31,13 @@ export class AngleUnitButton {
     const button = document.createElement("button");
     button.classList.add("angle_mode_button");
     button.addEventListener("click", () => {
-      console.log("Angle mode click");
       this.model.toggleAngleUnit();
-      this.updateLabel();
     });
     return button;
   }
 
-  private updateLabel() {
-    this.setLabel(this.model.getAngleUnit().getLabel());
+  public updateLabel(angleUnit: AngleUnit): void {
+    this.setLabel(angleUnit.getLabel());
   }
 
   private initCss() {
@@ -53,5 +60,22 @@ export class AngleUnitButton {
       `,
       "angle_mode_button",
     );
+  }
+}
+
+class AngleUnitButtonSubscriber
+  extends BaseCalculatorSubscriber
+  implements CalculatorSubscriber
+{
+  constructor(private angleUnitButton: AngleUnitButton) {
+    super();
+  }
+
+  modelInitialized({ angleUnit }: { angleUnit: AngleUnit }) {
+    this.angleUnitButton.updateLabel(angleUnit);
+  }
+
+  angleUnitUpdated(angleUnit: AngleUnit) {
+    this.angleUnitButton.updateLabel(angleUnit);
   }
 }

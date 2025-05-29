@@ -4,9 +4,10 @@ import {
   type UnOperatorCalculatedEvent,
   type CalculatorSubscriber,
 } from "./calculator-subscriber";
+import type { AngleUnit } from "./angle-unit";
 import type { BiOperator, UnOperator } from "./operator";
-import { createElementFromHTML, injectCss } from "./utils";
 import type { CalculatorModel } from "./calculator-model";
+import { createElementFromHTML, injectCss } from "./utils";
 
 export class CalculatorHistory {
   private root: HTMLDivElement;
@@ -42,7 +43,7 @@ export class CalculatorHistory {
       }
 
       if (event.type === "UnOperatorCalculatedEvent") {
-        this.addUnOperation(event.operand, event.operator);
+        this.addUnOperation(event.operand, event.operator, event.angleUnit);
       }
     });
   }
@@ -66,10 +67,14 @@ export class CalculatorHistory {
     this.root.append(historyItem);
   }
 
-  public addUnOperation(firstOperand: number, operator: UnOperator) {
+  public addUnOperation(
+    firstOperand: number,
+    operator: UnOperator,
+    angleUnit: AngleUnit,
+  ) {
     const historyItem = createElementFromHTML(/*html*/ `
       <div class="calculator_history-item ${operator.getHistoryClass()}">
-        ${operator.getHistoryText(firstOperand, this.model.getAngleUnit())}
+        ${operator.getHistoryText(firstOperand, angleUnit)}
       </div>
       `);
 
@@ -161,7 +166,7 @@ class HistorySubscriber
   }
 
   unOperatorCalculated(event: UnOperatorCalculatedEvent): void {
-    this.history.addUnOperation(event.operand, event.operator);
+    this.history.addUnOperation(event.operand, event.operator, event.angleUnit);
   }
 
   historyCleared() {

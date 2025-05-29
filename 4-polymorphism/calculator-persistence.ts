@@ -47,6 +47,7 @@ const CalculatorSerializableStateSchema = z.object({
         operator: SerializableUnOperatorSchema,
         operand: z.number(),
         result: z.number(),
+        angleUnit: SerializableAngleUnitSchema,
       }),
     ])
     .array(),
@@ -71,6 +72,83 @@ class CalculatorPersistence {
       },
       version,
     );
+  }
+
+  public load(): CalculatorPersistedState | null {
+    try {
+      const serializableState = this.storage.safeLoad();
+
+      if (!serializableState) {
+        return null;
+      }
+
+      return {
+        ...serializableState,
+        angleUnit: serializableState.angleUnit
+          ? AngleUnitFactory.fromSerializable(serializableState.angleUnit)
+          : null,
+        operator: serializableState.operator
+          ? BiOperatorFactory.fromSerializable(serializableState.operator)
+          : null,
+        events: serializableState.events.map((event) => {
+          const { type } = event;
+
+          switch (type) {
+            case "BiOperatorCalculatedEvent": {
+              const operator = BiOperatorFactory.fromSerializable(
+                event.operator,
+              );
+
+              if (!operator) {
+                throw new Error(
+                  `Unsupported operator ${JSON.stringify(event.operator)}`,
+                );
+              }
+
+              return {
+                ...event,
+                operator,
+              };
+            }
+
+            case "UnOperatorCalculatedEvent": {
+              const operator = UnOperatorFactory.fromSerializable(
+                event.operator,
+              );
+
+              if (!operator) {
+                throw new Error(
+                  `Unsupported operator ${JSON.stringify(event.operator)}`,
+                );
+              }
+
+              const angleUnit = AngleUnitFactory.fromSerializable(
+                event.angleUnit,
+              );
+
+              if (!angleUnit) {
+                throw new Error(
+                  `Unsupported angleUnit ${JSON.stringify(event.angleUnit)}`,
+                );
+              }
+
+              return {
+                ...event,
+                operator,
+                angleUnit,
+              };
+            }
+
+            default: {
+              isNever(type);
+              throw new Error(`Unsupported event type  ${type}`);
+            }
+          }
+        }),
+      };
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -143,6 +221,7 @@ class CalculatorPersistenceSubscriber
         {
           ...event,
           operator: UnOperatorFactory.toSerializable(event.operator),
+          angleUnit: AngleUnitFactory.toSerializable(event.angleUnit),
         },
       ],
     }));
@@ -183,153 +262,22 @@ class CalculatorPersistenceFacade {
     return this.persistence.subscriber;
   }
 
-  public load(): CalculatorPersistedState | null {
-    try {
-      const serializableState = this.persistence.storage.safeLoad();
-
-      if (!serializableState) {
-        return null;
-      }
-
-      return {
-        ...serializableState,
-        angleUnit: serializableState.angleUnit
-          ? AngleUnitFactory.fromSerializable(serializableState.angleUnit)
-          : null,
-        operator: serializableState.operator
-          ? BiOperatorFactory.fromSerializable(serializableState.operator)
-          : null,
-        events: serializableState.events.map((event) => {
-          const { type } = event;
-
-          switch (type) {
-            case "BiOperatorCalculatedEvent": {
-              const operator = BiOperatorFactory.fromSerializable(
-                event.operator,
-              );
-
-              if (!operator) {
-                throw new Error(
-                  `Unsupported operator ${JSON.stringify(event.operator)}`,
-                );
-              }
-
-              return {
-                ...event,
-                operator,
-              };
-            }
-
-            case "UnOperatorCalculatedEvent": {
-              const operator = UnOperatorFactory.fromSerializable(
-                event.operator,
-              );
-
-              if (!operator) {
-                throw new Error(
-                  `Unsupported operator ${JSON.stringify(event.operator)}`,
-                );
-              }
-
-              return {
-                ...event,
-                operator,
-              };
-            }
-
-            default: {
-              isNever(type);
-              throw new Error(`Unsupported event type  ${type}`);
-            }
-          }
-        }),
-      };
-    } catch {
-      return null;
-    }
-  }
-
-  public static getInitialModelState(
-    persistedState: CalculatorPersistedState | null,
-  ) {
+  public getInitialStates() {
+    const persistedState = this.persistence.load();
     if (!persistedState) {
       return null;
     }
 
     return {
-      firstOperand: persistedState.firstOperand,
-      operator: persistedState.operator,
-      secondOperand: persistedState.secondOperand,
-      angleUnit: persistedState.angleUnit,
-    };
-  }
-
-  public static getInitialDisplayState(
-    persistedState: CalculatorPersistedState | null,
-  ) {
-    if (!persistedState) {
-      return null;
-    }
-
-    const { firstOperand, operator, secondOperand } = persistedState;
-
-    if (operator) {
-      if (secondOperand !== null) {
-        return { number: secondOperand };
-      }
-
-      return null;
-    }
-
-    if (firstOperand !== null) {
-      return { number: firstOperand };
-    }
-
-    return null;
-  }
-
-  public static getInitialExpressionState(
-    persistedState: CalculatorPersistedState | null,
-  ) {
-    if (!persistedState) {
-      return null;
-    }
-
-    const { firstOperand, operator } = persistedState;
-
-    if (operator && firstOperand !== null) {
-      return {
-        operator,
-        firstOperand,
-      };
-    }
-
-    return null;
-  }
-
-  public static getInitialHistoryState(
-    persistedState: CalculatorPersistedState | null,
-  ) {
-    if (!persistedState) {
-      return null;
-    }
-
-    return {
-      events: persistedState.events,
-    };
-  }
-
-  public static getInitialCalculatorStates(
-    persistedState: CalculatorPersistedState | null,
-  ) {
-    return {
-      model: CalculatorPersistenceFacade.getInitialModelState(persistedState),
-      display:
-        CalculatorPersistenceFacade.getInitialDisplayState(persistedState),
-      expression:
-        CalculatorPersistenceFacade.getInitialExpressionState(persistedState),
-      history:
-        CalculatorPersistenceFacade.getInitialHistoryState(persistedState),
+      model: {
+        firstOperand: persistedState.firstOperand,
+        operator: persistedState.operator,
+        secondOperand: persistedState.secondOperand,
+        angleUnit: persistedState.angleUnit,
+      },
+      history: {
+        events: persistedState.events,
+      },
     };
   }
 }

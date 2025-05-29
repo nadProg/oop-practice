@@ -2,22 +2,16 @@ import {
   BaseCalculatorSubscriber,
   type CalculatorSubscriber,
 } from "./calculator-subscriber";
-import type { BiOperator } from "./operator";
 import { injectCss } from "./utils";
+import type { BiOperator } from "./operator";
 
 export class CalculatorExpression {
   private root: HTMLDivElement;
 
   public readonly subscriber = new ExpressionSubscriber(this);
 
-  constructor(
-    initState?: { operator: BiOperator; firstOperand: number } | null,
-  ) {
+  constructor() {
     this.root = this.createRoot();
-
-    if (initState) {
-      this.setOperator(initState.firstOperand, initState.operator);
-    }
   }
 
   public renderTo(container: Element) {
@@ -63,6 +57,18 @@ class ExpressionSubscriber
 {
   constructor(private expression: CalculatorExpression) {
     super();
+  }
+
+  modelInitialized({
+    firstOperand,
+    operator,
+  }: {
+    firstOperand: number | null;
+    operator: BiOperator | null;
+  }): void {
+    if (operator && firstOperand !== null) {
+      this.expression.setOperator(firstOperand, operator);
+    }
   }
 
   biOperatorAdded(operator: BiOperator, operand: number): void {

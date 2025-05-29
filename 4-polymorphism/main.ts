@@ -33,20 +33,21 @@ class Calculator {
 
   constructor(key: string) {
     this.persistence = new CalculatorPersistence(key);
-    const initialStates = CalculatorPersistence.getInitialCalculatorStates(
-      this.persistence.load(),
-    );
+    const initialStates = this.persistence.getInitialStates();
 
-    this.model = new CalculatorModel(initialStates.model);
-    this.display = new CalculatorDisplay(initialStates.display);
-    this.expression = new CalculatorExpression(initialStates.expression);
-    this.history = new CalculatorHistory(this.model, initialStates.history);
+    this.model = new CalculatorModel();
+    this.display = new CalculatorDisplay();
+    this.expression = new CalculatorExpression();
+    this.history = new CalculatorHistory(this.model, initialStates?.history);
     this.angleModeButton = new AngleUnitButton(this.model);
 
     this.model.addSubscriber(this.display.subscriber);
     this.model.addSubscriber(this.expression.subscriber);
     this.model.addSubscriber(this.history.subscriber);
     this.model.addSubscriber(this.persistence.subscriber);
+    this.model.addSubscriber(this.angleModeButton.subscriber);
+
+    this.model.init(initialStates?.model);
 
     /* prettier-ignore */
     this.buttons = [

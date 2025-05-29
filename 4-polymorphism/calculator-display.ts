@@ -3,6 +3,7 @@ import {
   type CalculatorSubscriber,
 } from "./calculator-subscriber";
 import { injectCss } from "./utils";
+import type { BiOperator } from "./operator";
 
 export class CalculatorDisplay {
   private root: HTMLDivElement;
@@ -59,6 +60,28 @@ class DisplaySubscriber
 {
   constructor(private display: CalculatorDisplay) {
     super();
+  }
+
+  modelInitialized({
+    firstOperand,
+    secondOperand,
+    operator,
+  }: {
+    firstOperand: number | null;
+    operator: BiOperator | null;
+    secondOperand: number | null;
+  }) {
+    if (operator) {
+      if (secondOperand !== null) {
+        return this.display.setNumber(secondOperand);
+      }
+
+      return null;
+    }
+
+    if (firstOperand !== null) {
+      return this.display.setNumber(firstOperand);
+    }
   }
 
   currentOperandUpdated(operand: number): void {
